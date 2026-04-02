@@ -42,13 +42,13 @@ public class BaseEntity implements Serializable {
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    private Date gmtCreate;
+    private Date createTime;
 
     /**
      * 修改时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date gmtModified;
+    private Date updateTime;
 
     public Long getId() {
         return id;
@@ -74,20 +74,20 @@ public class BaseEntity implements Serializable {
         this.lockVersion = lockVersion;
     }
 
-    public Date getGmtCreate() {
-        return gmtCreate;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setGmtCreate(Date gmtCreate) {
-        this.gmtCreate = gmtCreate;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
-    public Date getGmtModified() {
-        return gmtModified;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setGmtModified(Date gmtModified) {
-        this.gmtModified = gmtModified;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     @Override
