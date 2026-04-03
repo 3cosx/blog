@@ -103,6 +103,19 @@
                 <artifactId>blog-base</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>cn.cosx</groupId>
+                <artifactId>blog-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>cn.cosx</groupId>
+                <artifactId>blog-config</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>cn.cosx</groupId>
                 <artifactId>blog-database</artifactId>
@@ -115,7 +128,46 @@
             </dependency>
             <dependency>
                 <groupId>cn.cosx</groupId>
+                <artifactId>blog-sms</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.cosx</groupId>
+                <artifactId>blog-lock</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.cosx</groupId>
+                <artifactId>blog-notice</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.cosx</groupId>
+                <artifactId>blog-sms</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.cosx</groupId>
+                <artifactId>blog-sms</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.cosx</groupId>
+                <artifactId>blog-limiter</artifactId>
+                <version>${project.version}</version>
+
+            </dependency>
+            <dependency>
+                <groupId>cn.cosx</groupId>
                 <artifactId>blog-cache</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.cosx</groupId>
+                <artifactId>blog-user</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

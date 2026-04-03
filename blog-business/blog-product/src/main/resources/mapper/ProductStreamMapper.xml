@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.cosx.blog.product.infrastructure.mapper.ProductStreamMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.cosx.blog.product.domain.entity.ProductStream">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+        <result column="lock_version" property="lockVersion"/>
+        <result column="product_id" property="productId"/>
+        <result column="stream_type" property="streamType"/>
+        <result column="quantity" property="quantity"/>
+        <result column="before_stock" property="beforeStock"/>
+        <result column="after_stock" property="afterStock"/>
+        <result column="identifier" property="identifier"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, create_time, update_time, deleted, lock_version, 
+        product_id, stream_type, quantity, before_stock, 
+        after_stock, identifier, remark
+    </sql>
+
+</mapper>

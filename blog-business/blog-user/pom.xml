@@ -30,6 +30,10 @@
 
         <dependency>
             <groupId>cn.cosx</groupId>
+            <artifactId>blog-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.cosx</groupId>
             <artifactId>blog-database</artifactId>
         </dependency>
 
@@ -46,7 +50,10 @@
             <groupId>cn.cosx</groupId>
             <artifactId>blog-sa-token</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>cn.cosx</groupId>
+            <artifactId>blog-lock</artifactId>
+        </dependency>
         <dependency>
             <groupId>cn.cosx</groupId>
             <artifactId>blog-web</artifactId>

@@ -1,4 +1,4 @@
-package cn.cosx.bloggateway;
+package cn.cosx.blog.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

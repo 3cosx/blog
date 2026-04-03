@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    active: dev
+  chain:
+    type: WEN_CHANG
+  application:
+    name: @application.name@
+  config:
+    import: classpath:base.yml,classpath:datasource.yml,classpath:rpc.yml,classpath:cache.yml   #这里爆红可以直接忽略，没有任何影响
+server:
+  port: 8085
+
+dubbo:
+  application:
+    qos-port: 33334
+

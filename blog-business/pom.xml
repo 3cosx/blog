@@ -4,15 +4,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
-    <modules>
-        <module>blog-user</module>
-    </modules>
 
     <parent>
         <groupId>cn.cosx</groupId>
         <artifactId>blog</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+    <modules>
+        <module>blog-user</module>
+        <module>blog-notice</module>
+        <module>blog-app</module>
+        <module>blog-product</module>
+        <module>blog-inventory</module>
+        <module>blog-order</module>
+    </modules>
+
 
 
     <groupId>cn.cosx</groupId>

@@ -25,33 +25,51 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!--  限流组件  -->
-        <!--    Sentinel    -->
         <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+            <groupId>cn.cosx</groupId>
+            <artifactId>blog-base</artifactId>
         </dependency>
 
-        <!-- Sentinel Spring Cloud Gateway 适配器 -->
         <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-alibaba-sentinel-gateway</artifactId>
-            <version>2023.0.3.3</version>
+            <groupId>cn.cosx</groupId>
+            <artifactId>blog-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.cosx</groupId>
+            <artifactId>blog-cache</artifactId>
         </dependency>
 
-        <!-- Sentinel Transport (用于连接 Dashboard) -->
         <dependency>
-            <groupId>com.alibaba.csp</groupId>
-            <artifactId>sentinel-transport-simple-http</artifactId>
-            <version>1.8.6</version>
+            <groupId>cn.cosx</groupId>
+            <artifactId>blog-api</artifactId>
         </dependency>
+<!--        &lt;!&ndash;  限流组件  &ndash;&gt;-->
+<!--        &lt;!&ndash;    Sentinel    &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>-->
+<!--        </dependency>-->
 
-        <!-- Sentinel Datasource (使用 Nacos 存储规则) -->
-        <dependency>
-            <groupId>com.alibaba.csp</groupId>
-            <artifactId>sentinel-datasource-nacos</artifactId>
-            <version>1.8.6</version>
-        </dependency>
+<!--        &lt;!&ndash; Sentinel Spring Cloud Gateway 适配器 &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-alibaba-sentinel-gateway</artifactId>-->
+<!--            <version>2023.0.3.3</version>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; Sentinel Transport (用于连接 Dashboard) &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.csp</groupId>-->
+<!--            <artifactId>sentinel-transport-simple-http</artifactId>-->
+<!--            <version>1.8.6</version>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; Sentinel Datasource (使用 Nacos 存储规则) &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.csp</groupId>-->
+<!--            <artifactId>sentinel-datasource-nacos</artifactId>-->
+<!--            <version>1.8.6</version>-->
+<!--        </dependency>-->
 
 
         <!-- Sa-Token 权限认证 -->
@@ -105,7 +123,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <!--                    <skip>true</skip>-->
-                    <mainClass>cn.cosx.bloggateway.BlogGatewayApplication</mainClass>
+                    <mainClass>cn.cosx.blog.gateway.BlogGatewayApplication</mainClass>
                 </configuration>
 
                 <executions>

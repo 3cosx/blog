@@ -23,7 +23,7 @@ public class BaseEntity implements Serializable {
      * 主键
      */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private String id;
     /**
      * 是否删除
      */
@@ -50,52 +50,6 @@ public class BaseEntity implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public Integer getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Integer deleted) {
-        this.deleted = deleted;
-    }
-
-    public Integer getLockVersion() {
-        return lockVersion;
-    }
-
-    public void setLockVersion(Integer lockVersion) {
-        this.lockVersion = lockVersion;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", BaseEntity.class.getSimpleName() + "[", "]")
-                .add("id=" + id)
-                .add("deleted=" + deleted)
-                .add("lockVersion=" + lockVersion)
-                .toString();
-    }
 }

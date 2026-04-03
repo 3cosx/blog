@@ -30,6 +30,10 @@
         <module>blog-sa-token</module>
         <module>blog-web</module>
         <module>blog-config</module>
+        <module>blog-sms</module>
+        <module>blog-lock</module>
+        <module>blog-limiter</module>
+        <module>blog-file</module>
 
     </modules>
     <dependencies>

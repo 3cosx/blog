@@ -1,10 +1,8 @@
 spring:
-  autoconfigure:
-    exclude: org.apache.shardingsphere.spring.boot.ShardingSphereAutoConfiguration
   datasource:
-    url: ${nft.turbo.mysql.url}
-    username: ${nft.turbo.mysql.username}
-    password: ${nft.turbo.mysql.password}
+    url: ${blog.mysql.url}
+    username: ${blog.mysql.username}
+    password: ${blog.mysql.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     # Druid连接池配置

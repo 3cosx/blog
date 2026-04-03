@@ -18,4 +18,8 @@ public class UserQueryRequest implements Serializable {
      * 用户ID
      */
     private String userId;
+
+    private String phone;
+
+    private String email;
 }

@@ -38,6 +38,11 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.cosx</groupId>
+            <artifactId>blog-api</artifactId>
+        </dependency>
+
         <!-- blog-sa-token -->
         <dependency>
             <groupId>cn.cosx</groupId>
@@ -62,6 +67,21 @@
             <artifactId>blog-cache</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.cosx</groupId>
+            <artifactId>blog-sms</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.cosx</groupId>
+            <artifactId>blog-rpc</artifactId>
+        </dependency>
+
+        <!-- blog-config - Nacos 服务注册与发现 -->
+        <dependency>
+            <groupId>cn.cosx</groupId>
+            <artifactId>blog-config</artifactId>
+        </dependency>
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>

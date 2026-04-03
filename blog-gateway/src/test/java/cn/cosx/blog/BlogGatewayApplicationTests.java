@@ -1,4 +1,4 @@
-package cn.cosx.bloggateway;
+package cn.cosx.blog;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

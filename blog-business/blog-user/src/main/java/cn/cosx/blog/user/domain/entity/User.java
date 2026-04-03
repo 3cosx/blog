@@ -1,5 +1,9 @@
 package cn.cosx.blog.user.domain.entity;
 
+import cn.cosx.blog.api.user.enums.UserRoleEnum;
+import cn.cosx.blog.api.user.enums.UserStateEnum;
+import cn.cosx.blog.api.user.request.UserRegisterRequest;
+import cn.cosx.blog.api.user.vo.UserInfo;
 import cn.cosx.blog.database.domain.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -79,5 +83,14 @@ public class User extends BaseEntity {
      */
     @TableField("email")
     private String email;
+
+
+    public User register(String email,String nickName) {
+        this.setEmail(email);
+        this.setState(UserStateEnum.INIT.getCode());
+        this.setNickName(nickName);
+        this.setUserRole(UserRoleEnum.NORMAL.getCode());
+        return this;
+    }
 
 }

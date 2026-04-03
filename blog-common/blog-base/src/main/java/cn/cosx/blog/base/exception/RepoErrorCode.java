@@ -3,7 +3,7 @@ package cn.cosx.blog.base.exception;
 /**
  * 错误码
  *
- * @author hollis
+ * @author cosx
  */
 public enum RepoErrorCode implements ErrorCode {
     /**
@@ -19,7 +19,10 @@ public enum RepoErrorCode implements ErrorCode {
     /**
      * 数据库更新失败
      */
-    UPDATE_FAILED("UPDATE_FAILED", "数据库更新失败");
+    UPDATE_FAILED("UPDATE_FAILED", "数据库更新失败"),
+
+    DATA_NOT_FOUND("DATA_NOT_FOUND", "数据未找到"),
+    ;
 
     private String code;
 

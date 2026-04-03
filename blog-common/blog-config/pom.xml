@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>blog-config</artifactId>
-    <groupId>cn.hollis</groupId>
+    <groupId>cn.cosx</groupId>
     <version>0.0.1-SNAPSHOT</version>
     <description>配置模块</description>
 
