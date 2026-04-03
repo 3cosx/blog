@@ -23,7 +23,7 @@ public class ProductUpdateRequest implements Serializable {
     /**
      * 商品ID
      */
-    private String productId;
+    private Long productId;
 
     /**
      * 商品名称
@@ -38,7 +38,7 @@ public class ProductUpdateRequest implements Serializable {
     /**
      * 商品分类ID
      */
-    private String categoryId;
+    private Long categoryId;
 
     /**
      * 商品价格

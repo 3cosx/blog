@@ -38,7 +38,7 @@ public class Product extends BaseEntity {
      * 商品分类ID
      */
     @TableField("category_id")
-    private String categoryId;
+    private Long categoryId;
 
     /**
      * 商品价格

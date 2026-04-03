@@ -23,7 +23,7 @@ public class ProductInfo implements Serializable {
     /**
      * 主键ID
      */
-    private String id;
+    private Long id;
 
     /**
      * 商品名称
@@ -38,7 +38,7 @@ public class ProductInfo implements Serializable {
     /**
      * 商品分类ID
      */
-    private String categoryId;
+    private Long categoryId;
 
     /**
      * 商品价格

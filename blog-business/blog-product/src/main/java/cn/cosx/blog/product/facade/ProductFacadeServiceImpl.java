@@ -15,7 +15,6 @@ import cn.cosx.blog.product.domain.entity.ProductCategory;
 import cn.cosx.blog.product.domain.service.ProductCategoryService;
 import cn.cosx.blog.product.domain.service.ProductService;
 import jakarta.annotation.Resource;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import java.util.List;
@@ -39,7 +38,7 @@ public class ProductFacadeServiceImpl implements ProductFacadeService {
     public Response<ProductInfo> queryProductById(ProductQueryRequest request) {
         Product product = productService
                 .lambdaQuery()
-                .eq(StringUtils.isNotBlank(request.getProductId()), Product::getId, request.getProductId())
+                .eq(request.getProductId() != null, Product::getId, request.getProductId())
                 .one();
         ProductInfo productInfo = ProductConverter.INSTANCE.product2ProductInfo(product);
         return Response.of(productInfo);
@@ -78,13 +77,13 @@ public class ProductFacadeServiceImpl implements ProductFacadeService {
     }
 
     @Override
-    public Response<Boolean> onShelf(String productId) {
+    public Response<Boolean> onShelf(Long productId) {
         Boolean result = productService.onShelf(productId);
         return Response.of(result);
     }
 
     @Override
-    public Response<Boolean> offShelf(String productId) {
+    public Response<Boolean> offShelf(Long productId) {
         Boolean result = productService.offShelf(productId);
         return Response.of(result);
     }
@@ -93,7 +92,7 @@ public class ProductFacadeServiceImpl implements ProductFacadeService {
     public Response<ProductCategoryInfo> queryCategoryById(ProductCategoryQueryRequest request) {
         ProductCategory category = productCategoryService
                 .lambdaQuery()
-                .eq(StringUtils.isNotBlank(request.getCategoryId()), ProductCategory::getId, request.getCategoryId())
+                .eq(request.getCategoryId() != null, ProductCategory::getId, request.getCategoryId())
                 .one();
         ProductCategoryInfo categoryInfo = ProductConverter.INSTANCE.category2CategoryInfo(category);
         return Response.of(categoryInfo);
@@ -101,7 +100,7 @@ public class ProductFacadeServiceImpl implements ProductFacadeService {
 
     @Override
     public Response<ProductCategoryQueryResponse> querySubCategories(ProductCategoryQueryRequest request) {
-        String parentId = StringUtils.isNotBlank(request.getParentId()) ? request.getParentId() : "0";
+        Long parentId = request.getParentId() != null ? request.getParentId() : 0L;
         List<ProductCategory> categories = productCategoryService.findByParentId(parentId);
         
         List<ProductCategoryInfo> categoryInfoList = categories.stream()

@@ -42,7 +42,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     private ProductCategoryService productCategoryService;
 
     @Override
-    public Product findById(String productId) {
+    public Product findById(Long productId) {
         return productMapper.selectById(productId);
     }
 
@@ -77,7 +77,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean onShelf(String productId) {
+    public Boolean onShelf(Long productId) {
         Product product = productMapper.selectById(productId);
         Assert.notNull(product, () -> new BizException(RepoErrorCode.DATA_NOT_FOUND));
 
@@ -90,7 +90,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean offShelf(String productId) {
+    public Boolean offShelf(Long productId) {
         Product product = productMapper.selectById(productId);
         Assert.notNull(product, () -> new BizException(RepoErrorCode.DATA_NOT_FOUND));
 
@@ -104,7 +104,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     @Override
     public List<ProductInfo> pageQueryProductInfo(ProductPageQueryRequest request) {
         // 获取该分类及其子分类的ID列表
-        List<String> categoryIds = getCategoryIds(request.getCategoryId());
+        List<Long> categoryIds = getCategoryIds(request.getCategoryId());
         
         if (categoryIds.isEmpty()) {
             return List.of();
@@ -127,8 +127,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     /**
      * 获取分类ID及其所有子分类ID
      */
-    private List<String> getCategoryIds(String categoryId) {
-        List<String> categoryIds = new ArrayList<>();
+    private List<Long> getCategoryIds(Long categoryId) {
+        List<Long> categoryIds = new ArrayList<>();
         if (categoryId == null) {
             return categoryIds;
         }
@@ -145,7 +145,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     /**
      * 递归加载子分类ID
      */
-    private void loadChildrenCategoryIds(String parentId, List<String> categoryIds) {
+    private void loadChildrenCategoryIds(Long parentId, List<Long> categoryIds) {
         List<ProductCategory> children = productCategoryService.findByParentId(parentId);
         if (children == null || children.isEmpty()){
             return ;

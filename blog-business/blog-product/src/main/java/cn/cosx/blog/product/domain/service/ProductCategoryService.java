@@ -18,7 +18,7 @@ public interface ProductCategoryService extends IService<ProductCategory> {
      * @param categoryId 分类ID
      * @return 分类实体
      */
-    ProductCategory findById(String categoryId);
+    ProductCategory findById(Long categoryId);
 
     /**
      * 查询子分类列表
@@ -26,7 +26,7 @@ public interface ProductCategoryService extends IService<ProductCategory> {
      * @param parentId 父分类ID
      * @return 子分类列表
      */
-    List<ProductCategory> findByParentId(String parentId);
+    List<ProductCategory> findByParentId(Long parentId);
 
     /**
      * 查询所有分类

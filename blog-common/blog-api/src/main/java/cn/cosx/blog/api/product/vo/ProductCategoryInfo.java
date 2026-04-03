@@ -22,7 +22,7 @@ public class ProductCategoryInfo implements Serializable {
     /**
      * 主键ID
      */
-    private String id;
+    private Long id;
 
     /**
      * 分类名称
@@ -32,7 +32,7 @@ public class ProductCategoryInfo implements Serializable {
     /**
      * 父分类ID
      */
-    private String parentId;
+    private Long parentId;
 
     /**
      * 排序值

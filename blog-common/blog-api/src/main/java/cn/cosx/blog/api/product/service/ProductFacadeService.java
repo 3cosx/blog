@@ -47,7 +47,7 @@ public interface ProductFacadeService {
      * @param productId 商品ID
      * @return 上架结果
      */
-    Response<Boolean> onShelf(String productId);
+    Response<Boolean> onShelf(Long productId);
 
     /**
      * 商品下架
@@ -55,7 +55,7 @@ public interface ProductFacadeService {
      * @param productId 商品ID
      * @return 下架结果
      */
-    Response<Boolean> offShelf(String productId);
+    Response<Boolean> offShelf(Long productId);
 
     /**
      * 根据分类ID查询分类信息

@@ -23,7 +23,7 @@ public class BaseEntity implements Serializable {
      * 主键
      */
     @TableId(type = IdType.AUTO)
-    private String id;
+    private Long id;
     /**
      * 是否删除
      */

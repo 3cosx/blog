@@ -21,12 +21,12 @@ public class ProductCategoryQueryRequest implements Serializable {
     /**
      * 分类ID
      */
-    private String categoryId;
+    private Long categoryId;
 
     /**
      * 父分类ID
      */
-    private String parentId;
+    private Long parentId;
 
     /**
      * 分类名称

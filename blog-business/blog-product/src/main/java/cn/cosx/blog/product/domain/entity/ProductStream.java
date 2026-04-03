@@ -23,7 +23,7 @@ public class ProductStream extends BaseEntity {
      * 商品ID
      */
     @TableField("product_id")
-    private String productId;
+    private Long productId;
 
     /**
      * 流水类型：入库/出库/锁定/释放等
@@ -64,7 +64,7 @@ public class ProductStream extends BaseEntity {
     /**
      * 创建入库流水
      */
-    public static ProductStream createInStream(String productId, Long quantity, Long beforeStock, String identifier) {
+    public static ProductStream createInStream(Long productId, Long quantity, Long beforeStock, String identifier) {
         ProductStream stream = new ProductStream();
         stream.setProductId(productId);
         stream.setStreamType(ProductStreamTypeEnum.IN.getCode());
@@ -78,7 +78,7 @@ public class ProductStream extends BaseEntity {
     /**
      * 创建出库流水
      */
-    public static ProductStream createOutStream(String productId, Long quantity, Long beforeStock, String identifier) {
+    public static ProductStream createOutStream(Long productId, Long quantity, Long beforeStock, String identifier) {
         ProductStream stream = new ProductStream();
         stream.setProductId(productId);
         stream.setStreamType(ProductStreamTypeEnum.OUT.getCode());
@@ -92,7 +92,7 @@ public class ProductStream extends BaseEntity {
     /**
      * 创建锁定流水
      */
-    public static ProductStream createLockStream(String productId, Long quantity, Long beforeStock, String identifier) {
+    public static ProductStream createLockStream(Long productId, Long quantity, Long beforeStock, String identifier) {
         ProductStream stream = new ProductStream();
         stream.setProductId(productId);
         stream.setStreamType(ProductStreamTypeEnum.LOCK.getCode());

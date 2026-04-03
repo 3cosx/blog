@@ -26,12 +26,12 @@ public class ProductCategoryServiceImpl extends ServiceImpl<ProductCategoryMappe
     private ProductCategoryMapper productCategoryMapper;
 
     @Override
-    public ProductCategory findById(String categoryId) {
+    public ProductCategory findById(Long categoryId) {
         return productCategoryMapper.selectById(categoryId);
     }
 
     @Override
-    public List<ProductCategory> findByParentId(String parentId) {
+    public List<ProductCategory> findByParentId(Long parentId) {
         return this.lambdaQuery()
                 .eq(ProductCategory::getParentId, parentId)
                 .orderByAsc(ProductCategory::getSort)
@@ -53,11 +53,11 @@ public class ProductCategoryServiceImpl extends ServiceImpl<ProductCategoryMappe
             return Lists.newArrayList();
         }
         // 按父ID分组
-        Map<String, List<ProductCategory>> categoryMap = allCategories.stream()
-                .collect(Collectors.groupingBy(c -> c.getParentId() == null ? "0" : c.getParentId()));
+        Map<Long, List<ProductCategory>> categoryMap = allCategories.stream()
+                .collect(Collectors.groupingBy(c -> c.getParentId() == null ? 0L : c.getParentId()));
 
         // 获取顶级分类
-        List<ProductCategory> topCategories = categoryMap.getOrDefault("0", new ArrayList<>());
+        List<ProductCategory> topCategories = categoryMap.getOrDefault(0L, new ArrayList<>());
 
         // 递归设置子分类
         setChildren(topCategories, categoryMap);
@@ -68,7 +68,7 @@ public class ProductCategoryServiceImpl extends ServiceImpl<ProductCategoryMappe
     /**
      * 递归设置子分类
      */
-    private void setChildren(List<ProductCategory> categories, Map<String, List<ProductCategory>> categoryMap) {
+    private void setChildren(List<ProductCategory> categories, Map<Long, List<ProductCategory>> categoryMap) {
         if (categories == null || categories.isEmpty()) {
             return;
         }

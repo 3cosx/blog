@@ -15,7 +15,7 @@ public class ProductPageQueryRequest extends PageRequest {
      */
     private String status;
 
-    private String categoryId;
+    private Long categoryId;
 
     private Long lastProductId;
 }

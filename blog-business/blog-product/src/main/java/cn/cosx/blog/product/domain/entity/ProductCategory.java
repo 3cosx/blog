@@ -30,7 +30,7 @@ public class ProductCategory extends BaseEntity {
      * 父分类ID，0=顶级分类
      */
     @TableField("parent_id")
-    private String parentId;
+    private Long parentId;
 
     /**
      * 排序值
@@ -48,7 +48,7 @@ public class ProductCategory extends BaseEntity {
      * 判断是否为顶级分类
      */
     public boolean isTopCategory() {
-        return "0".equals(parentId) || parentId == null;
+        return parentId == null || parentId == 0L;
     }
 
 }

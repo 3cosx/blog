@@ -20,5 +20,5 @@ public interface ProductStreamService extends IService<ProductStream> {
      * @param quantity 变动数量
      * @return 流水ID
      */
-    String insertStream(Product product, ProductStreamTypeEnum type, Long quantity);
+    Long insertStream(Product product, ProductStreamTypeEnum type, Long quantity);
 }

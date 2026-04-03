@@ -25,7 +25,7 @@ public interface ProductMapper extends BaseMapper<Product> {
      * @return 商品列表
      */
     List<Product> selectByCategoryIdsWithCursor(
-            @Param("categoryIds") List<String> categoryIds,
+            @Param("categoryIds") List<Long> categoryIds,
             @Param("status") String status,
             @Param("lastId") Long lastId,
             @Param("pageSize") Integer pageSize);

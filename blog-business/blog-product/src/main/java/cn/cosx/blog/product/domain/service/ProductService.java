@@ -20,7 +20,7 @@ public interface ProductService extends IService<Product> {
      * @param productId 商品ID
      * @return 商品实体
      */
-    Product findById(String productId);
+    Product findById(Long productId);
 
     /**
      * 创建商品
@@ -44,7 +44,7 @@ public interface ProductService extends IService<Product> {
      * @param productId 商品ID
      * @return 上架结果
      */
-    Boolean onShelf(String productId);
+    Boolean onShelf(Long productId);
 
     /**
      * 商品下架
@@ -52,7 +52,7 @@ public interface ProductService extends IService<Product> {
      * @param productId 商品ID
      * @return 下架结果
      */
-    Boolean offShelf(String productId);
+    Boolean offShelf(Long productId);
 
     List<ProductInfo> pageQueryProductInfo(ProductPageQueryRequest request);
 }

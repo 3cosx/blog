@@ -33,7 +33,7 @@ public class ProductCreateRequest implements Serializable {
     /**
      * 商品分类ID
      */
-    private String categoryId;
+    private Long categoryId;
 
     /**
      * 商品价格
