@@ -67,12 +67,12 @@
         </dependency>
 
 <!--        <dependency>-->
-<!--            <groupId>cn.hollis</groupId>-->
+<!--            <groupId>cn.cosx</groupId>-->
 <!--            <artifactId>blog-job</artifactId>-->
 <!--        </dependency>-->
 
 <!--        <dependency>-->
-<!--            <groupId>cn.hollis</groupId>-->
+<!--            <groupId>cn.cosx</groupId>-->
 <!--            <artifactId>blog-skywalking</artifactId>-->
 <!--        </dependency>-->
 

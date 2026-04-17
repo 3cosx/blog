@@ -1,0 +1,75 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: dodo-agent
+  ai:
+    openai:
+      api-key: @dashscope.api.key@
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/
+      chat:
+        options:
+          model: qwen-lus
+          temperature: 0.7
+          max-tokens: 5000
+
+      embedding:
+        api-key: @dashscope.api.key@
+        base-url: https://dashscope.aliyuncs.com/compatible-mode/
+        options:
+          model: text-embedding-v4
+          dimmension: 1024
+  datasource:
+    url: jdbc:mysql://112.126.84.219/dodo?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 60000
+      connection-timeout: 30000
+      max-lifetime: 1800000
+  # MyBatis-Plus ??
+  mybatis-plus:
+    mapper-locations: classpath:mapper/*.xml
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+minio:
+  url: http://112.126.84.219:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucketName: rag-test
+  endpoint: http://112.126.84.219:9000
+
+embeddings:
+  store:
+    host: 112.126.84.219
+    port: 5432
+    database: vector_store
+    user: postgres
+    password: 123456
+
+# Tavily ??????
+tavily:
+  api-key: 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
+  mcp-url: https://mcp.tavily.com/mcp/
+
+grsai:
+  nanobanana:
+    api-key: sk-763b1007b663430eb27959382d902fee
+
+logging:
+  level:
+    org:
+      springframework:
+        ai: INFO
+    io:
+      modelcontextprotocol:
+        client: ERROR
+

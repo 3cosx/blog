@@ -16,6 +16,7 @@
         <module>blog-auth</module>
         <module>blog-gateway</module>
         <module>blog-business</module>
+        <module>blog-agent</module>
     </modules>
 
     <properties>
@@ -27,6 +28,11 @@
         <spring-cloud.version>2023.0.0</spring-cloud.version>
         <spring-cloud-alibaba.version>2023.0.1.2</spring-cloud-alibaba.version>
         <dubbo.version>3.2.10</dubbo.version>
+        <spring.ai.version>1.1.0</spring.ai.version>
+        <fastjson.version>2.0.43</fastjson.version>
+        <spring.ai.alibaba.version>1.1.2.0</spring.ai.alibaba.version>
+        <!-- 统一配置API Key ，记得改成你自己的-->
+        <dashscope.api.key>sk-259eb5a9833e403cb1eb4d40380a5510</dashscope.api.key>
     </properties>
 
     <dependencyManagement>
@@ -180,7 +186,24 @@
                 <artifactId>blog-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+
+            <dependency>
+                <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-bom</artifactId>
+                <version>${spring.ai.alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring.ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
+
 
 
     </dependencyManagement>
