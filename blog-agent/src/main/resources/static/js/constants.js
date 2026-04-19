@@ -18,11 +18,12 @@ const SUPPORTED_FILE_TYPES = {
         'application/msword',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'text/plain',
+        'text/markdown',
         'image/png',
         'image/jpeg',
         'image/jpg'
     ],
-    extensions: ['pdf', 'doc', 'docx', 'txt', 'png', 'jpg', 'jpeg']
+    extensions: ['pdf', 'doc', 'docx', 'txt', 'md', 'png', 'jpg', 'jpeg']
 };
 
 // 流式消息类型

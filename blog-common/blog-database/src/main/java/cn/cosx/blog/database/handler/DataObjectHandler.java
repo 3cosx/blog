@@ -3,13 +3,13 @@ package cn.cosx.blog.database.handler;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class DataObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
-        this.setFieldValByNameIfNull("createTime", new Date(), metaObject);
-        this.setFieldValByNameIfNull("updateTime", new Date(), metaObject);
+        this.setFieldValByNameIfNull("createTime", LocalDateTime.now(), metaObject);
+        this.setFieldValByNameIfNull("updateTime", LocalDateTime.now(), metaObject);
         this.setFieldValByName("deleted", 0, metaObject);
         this.setFieldValByName("lockVersion", 0, metaObject);
 
@@ -17,7 +17,7 @@ public class DataObjectHandler implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        this.setFieldValByName("updateTime", new Date(), metaObject);
+        this.setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
     }
 
     /**

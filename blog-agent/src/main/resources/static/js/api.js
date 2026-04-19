@@ -112,7 +112,7 @@ const uploadFile = async (backendUrl, file) => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${backendUrl}/file/upload`, {
+    const response = await fetch(`${backendUrl}/document/upload`, {
         method: 'POST',
         body: formData
     });
@@ -125,7 +125,7 @@ const uploadFile = async (backendUrl, file) => {
     if (result.code === 200 && result.data) {
         return {
             success: true,
-            fileId: result.data.fileId
+            fileId: result.data.docId
         };
     }
     throw new Error(result.message || '文件上传失败');

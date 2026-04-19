@@ -1,10 +1,10 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : 127.0.0.1-localhost
+ Source Server         : 192.168.10.10
  Source Server Type    : MySQL
  Source Server Version : 80041 (8.0.41)
- Source Host           : localhost:3306
+ Source Host           : 192.168.10.10:3306
  Source Schema         : dodo
 
  Target Server Type    : MySQL

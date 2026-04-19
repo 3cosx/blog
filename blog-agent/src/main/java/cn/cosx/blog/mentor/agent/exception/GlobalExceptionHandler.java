@@ -14,9 +14,7 @@ import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
@@ -58,11 +56,11 @@ public class GlobalExceptionHandler {
         return BaseResult.fail(503, msg);
     }
 
-    @ExceptionHandler(AsyncRequestNotUsableException.class)
-    public void handleAsyncRequestNotUsableException(AsyncRequestNotUsableException e, HttpServletRequest request) {
-        log.debug("SSE连接已断开: requestUri={}, cause={}",
-                request.getRequestURI(), e.getCause() != null ? e.getCause().getMessage() : "未知原因");
-    }
+//    @ExceptionHandler(AsyncRequestNotUsableException.class)
+//    public void handleAsyncRequestNotUsableException(AsyncRequestNotUsableException e, HttpServletRequest request) {
+//        log.debug("SSE连接已断开: requestUri={}, cause={}",
+//                request.getRequestURI(), e.getCause() != null ? e.getCause().getMessage() : "未知原因");
+//    }
 
     @ExceptionHandler(IOException.class)
     public void handleIOException(IOException e, HttpServletRequest request) {

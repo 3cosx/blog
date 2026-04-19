@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文档上传 - Neural Sync</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="js/config.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --bg-card: #111827;
+            --accent-cyan: #00f0ff;
+            --accent-purple: #a855f7;
+            --accent-blue: #3b82f6;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.5);
+            --glow-purple: 0 0 20px rgba(168, 85, 247, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated grid background */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: var(--glow-cyan);
+            animation: float 15s infinite;
+            opacity: 0.6;
+        }
+
+        .particle:nth-child(2) { left: 20%; animation-delay: -2s; background: var(--accent-purple); box-shadow: var(--glow-purple); }
+        .particle:nth-child(3) { left: 40%; animation-delay: -4s; }
+        .particle:nth-child(4) { left: 60%; animation-delay: -6s; background: var(--accent-purple); box-shadow: var(--glow-purple); }
+        .particle:nth-child(5) { left: 80%; animation-delay: -8s; }
+        .particle:nth-child(6) { left: 10%; animation-delay: -10s; background: var(--accent-purple); box-shadow: var(--glow-purple); }
+        .particle:nth-child(7) { left: 30%; animation-delay: -12s; }
+        .particle:nth-child(8) { left: 50%; animation-delay: -14s; }
+        .particle:nth-child(9) { left: 70%; animation-delay: -3s; background: var(--accent-purple); box-shadow: var(--glow-purple); }
+        .particle:nth-child(10) { left: 90%; animation-delay: -7s; }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+        }
+
+        /* Main container */
+        .upload-container {
+            position: relative;
+            z-index: 10;
+            width: 520px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(17, 24, 39, 0.8) 100%);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            box-shadow:
+                0 0 40px rgba(0, 240, 255, 0.1),
+                inset 0 0 60px rgba(0, 240, 255, 0.02);
+            animation: containerFadeIn 0.8s ease-out;
+        }
+
+        @keyframes containerFadeIn {
+            0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Glowing corner accents */
+        .upload-container::before,
+        .upload-container::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 2px solid transparent;
+        }
+
+        .upload-container::before {
+            top: -1px;
+            left: -1px;
+            border-top: 2px solid var(--accent-cyan);
+            border-left: 2px solid var(--accent-cyan);
+            border-radius: 16px 0 0 0;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .upload-container::after {
+            bottom: -1px;
+            right: -1px;
+            border-bottom: 2px solid var(--accent-purple);
+            border-right: 2px solid var(--accent-purple);
+            border-radius: 0 0 16px 0;
+            box-shadow: var(--glow-purple);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+        }
+
+        .upload-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 30px rgba(0, 240, 255, 0.5); }
+            100% { text-shadow: 0 0 50px rgba(0, 240, 255, 0.8), 0 0 80px rgba(168, 85, 247, 0.4); }
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            letter-spacing: 6px;
+            margin-top: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 22px;
+            animation: formSlideIn 0.6s ease-out backwards;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes formSlideIn {
+            0% { opacity: 0; transform: translateX(-20px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .form-group label::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent-cyan);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(148, 163, 184, 0.5);
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2), inset 0 0 20px rgba(0, 240, 255, 0.05);
+            background: rgba(0, 240, 255, 0.03);
+        }
+
+        /* File input special styling */
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            border: 2px dashed rgba(0, 240, 255, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(0, 240, 255, 0.02);
+        }
+
+        .file-input-wrapper:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.05);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.1);
+        }
+
+        .file-input-wrapper.dragover {
+            border-color: var(--accent-purple);
+            background: rgba(168, 85, 247, 0.1);
+            transform: scale(1.02);
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            padding: 0;
+            border: none;
+            background: transparent;
+        }
+
+        .file-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.5));
+        }
+
+        .file-hint {
+            color: var(--text-secondary);
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .file-hint span {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* Selected file display */
+        .file-selected {
+            display: none;
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 8px;
+            animation: fileSelectedIn 0.4s ease-out;
+        }
+
+        @keyframes fileSelectedIn {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .file-selected.show {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-name {
+            flex: 1;
+            color: var(--accent-cyan);
+            font-weight: 600;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-size {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .file-remove {
+            background: none;
+            border: none;
+            color: var(--accent-purple);
+            cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .file-remove:hover {
+            transform: scale(1.2);
+        }
+
+        /* Upload button */
+        .btn-upload {
+            position: relative;
+            width: 100%;
+            padding: 16px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 8px;
+            color: var(--accent-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            animation: btnSlideIn 0.6s ease-out backwards;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes btnSlideIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-upload::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-upload:hover::before {
+            left: 100%;
+        }
+
+        .btn-upload:hover {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.4), 0 0 60px rgba(168, 85, 247, 0.2);
+            transform: translateY(-2px);
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.8);
+        }
+
+        .btn-upload:active {
+            transform: translateY(0);
+        }
+
+        .btn-upload:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: var(--text-secondary);
+            color: var(--text-secondary);
+            background: transparent;
+        }
+
+        .btn-upload:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Loading state */
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            color: var(--accent-cyan);
+            font-size: 14px;
+            letter-spacing: 3px;
+            animation: loadingPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loadingPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .loading::before {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 2px solid transparent;
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Result box */
+        .result-box {
+            display: none;
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            animation: resultSlideIn 0.5s ease-out;
+        }
+
+        @keyframes resultSlideIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-box.success {
+            display: block;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #22c55e;
+        }
+
+        .result-box.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+        }
+
+        .result-box .result-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .result-box.success .result-title { color: #22c55e; }
+        .result-box.error .result-title { color: #ef4444; }
+
+        .result-box pre {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* Back link */
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 240, 255, 0.1);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            animation: btnSlideIn 0.6s ease-out backwards;
+            animation-delay: 0.6s;
+        }
+
+        .back-link:hover {
+            color: var(--accent-cyan);
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+
+        .back-link::before {
+            content: '← ';
+        }
+
+        /* Scan line effect */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.03) 2px,
+                rgba(0, 0, 0, 0.03) 4px
+            );
+        }
+
+        /* Responsive */
+        @media (max-width: 560px) {
+            .upload-container {
+                width: 95%;
+                padding: 25px;
+            }
+            .upload-title {
+                font-size: 22px;
+                letter-spacing: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="scanline"></div>
+    <div class="particles">
+        <div class="particle" style="left: 5%;"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="upload-container">
+        <div class="header">
+            <h1 class="upload-title">Neural Sync</h1>
+            <p class="subtitle">文档上传系统</p>
+        </div>
+
+        <form id="uploadForm">
+            <div class="form-group">
+                <label>选择文件</label>
+                <div class="file-input-wrapper" id="dropZone">
+                    <input type="file" id="file" name="file" accept="*/*" required>
+                    <div class="file-icon">⬆</div>
+                    <p class="file-hint">拖拽文件到此处或 <span>点击选择</span></p>
+                    <p class="file-hint" style="font-size: 11px; margin-top: 5px;">支持任意格式文件</p>
+                </div>
+                <div class="file-selected" id="fileSelected">
+                    <span class="file-name" id="fileName"></span>
+                    <span class="file-size" id="fileSize"></span>
+                    <button type="button" class="file-remove" id="fileRemove">×</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="docTitle">文档标题</label>
+                <input type="text" id="docTitle" name="docTitle" placeholder="请输入文档标题">
+            </div>
+
+            <div class="form-group">
+                <label for="uploadUser">上传用户</label>
+                <input type="text" id="uploadUser" name="uploadUser" placeholder="请输入上传用户名" required>
+            </div>
+
+            <div class="form-group">
+                <label for="accessibleBy">访问权限</label>
+                <input type="text" id="accessibleBy" name="accessibleBy" placeholder="请输入允许访问的用户" required>
+            </div>
+
+            <button type="submit" class="btn-upload" id="uploadBtn">开始上传</button>
+            <div class="loading" id="loading">系统处理中，请稍候...</div>
+        </form>
+
+        <div class="result-box" id="resultBox">
+            <div class="result-title"></div>
+            <pre></pre>
+        </div>
+
+        <a href="index.html" class="back-link">返回首页</a>
+    </div>
+
+    <script>
+        const backendUrl = window.APP_CONFIG ? window.APP_CONFIG.backendUrl : 'http://192.168.10.10:9999';
+
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const loading = document.getElementById('loading');
+        const resultBox = document.getElementById('resultBox');
+        const fileInput = document.getElementById('file');
+        const dropZone = document.getElementById('dropZone');
+        const fileSelected = document.getElementById('fileSelected');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileRemove = document.getElementById('fileRemove');
+
+        // Drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                showFileInfo(e.dataTransfer.files[0]);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', function() {
+            if (this.files[0]) {
+                showFileInfo(this.files[0]);
+            }
+        });
+
+        function showFileInfo(file) {
+            fileName.textContent = file.name;
+            fileSize.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+            fileSelected.classList.add('show');
+        }
+
+        fileRemove.addEventListener('click', () => {
+            fileInput.value = '';
+            fileSelected.classList.remove('show');
+        });
+
+        // Form submit
+        uploadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const file = fileInput.files[0];
+            if (!file) {
+                showResult('error', '请选择要上传的文件');
+                return;
+            }
+
+            const docTitle = document.getElementById('docTitle').value;
+            const uploadUser = document.getElementById('uploadUser').value;
+            const accessibleBy = document.getElementById('accessibleBy').value;
+
+            if (!uploadUser || !accessibleBy) {
+                showResult('error', '请填写所有必填字段');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('docTitle', docTitle || file.name);
+            formData.append('uploadUser', uploadUser);
+            formData.append('accessibleBy', accessibleBy);
+
+            uploadBtn.disabled = true;
+            loading.style.display = 'block';
+            resultBox.style.display = 'none';
+
+            try {
+                const response = await fetch(`${backendUrl}/document/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    const data = result.data;
+                    let message = `文档ID: ${data.docId || 'N/A'}\n`;
+                    message += `文档标题: ${data.docTitle || 'N/A'}\n`;
+                    message += `上传用户: ${data.uploadUser || 'N/A'}\n`;
+                    message += `文档URL: ${data.docUrl || 'N/A'}\n`;
+                    message += `状态: ${data.status || 'N/A'}`;
+                    showResult('success', message);
+                    uploadForm.reset();
+                    fileSelected.classList.remove('show');
+                } else {
+                    showResult('error', '上传失败: ' + (result.message || '未知错误'));
+                }
+            } catch (error) {
+                showResult('error', '上传失败: ' + error.message);
+            } finally {
+                uploadBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+
+        function showResult(type, message) {
+            resultBox.className = 'result-box ' + type;
+            resultBox.querySelector('.result-title').textContent = type === 'success' ? '✓ 上传成功' : '✕ 上传失败';
+            resultBox.querySelector('pre').textContent = message;
+            resultBox.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

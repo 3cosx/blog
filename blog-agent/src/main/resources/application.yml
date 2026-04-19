@@ -4,13 +4,18 @@ server:
 spring:
   application:
     name: dodo-agent
+  data:
+    redis:
+      host: 192.168.10.10
+      password: 123456
+      port: 6379
   ai:
     openai:
       api-key: @dashscope.api.key@
       base-url: https://dashscope.aliyuncs.com/compatible-mode/
       chat:
         options:
-          model: qwen-lus
+          model: qwen-plus
           temperature: 0.7
           max-tokens: 5000
 
@@ -20,8 +25,9 @@ spring:
         options:
           model: text-embedding-v4
           dimmension: 1024
+
   datasource:
-    url: jdbc:mysql://112.126.84.219/dodo?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+    url: jdbc:mysql://192.168.10.10:3306/blog?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8&rewriteBatchedStatements=true
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -40,21 +46,33 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
 
+mineru:
+  api-key: eyJ0eXBlIjoiSldUIiwiYWxnIjoiSFM1MTIifQ.eyJqdGkiOiIxNzEwMDgyMyIsInJvbCI6IlJPTEVfUkVHSVNURVIiLCJpc3MiOiJPcGVuWExhYiIsImlhdCI6MTc3NjM1MTEzNywiY2xpZW50SWQiOiJsa3pkeDU3bnZ5MjJqa3BxOXgydyIsInBob25lIjoiIiwib3BlbklkIjpudWxsLCJ1dWlkIjoiYjg4Njk5NWQtMzU2Zi00N2U1LTljNWUtYTNjMDJlYWU3NjNhIiwiZW1haWwiOiIiLCJleHAiOjE3ODQxMjcxMzd9.dQKm_52XN6GfJOei6V_9XlmECaopLvGbzO5L26NEh2RVHSRe7NeiI9A06iTIF3HfOTvDmn66NXmSRfQd4_9TAA  # 请替换为实际的API Key
+  api-url: https://mineru.net
+  model-version: vlm
+  use-async-api: false  # 设置为 true 使用远程异步任务 API，false 使用同步文件解析 API
+  connect-timeout: 60000
+  response-timeout: 300000
+
 minio:
-  url: http://112.126.84.219:9000
+  url: http://192.168.10.10:9000
   accessKey: minioadmin
   secretKey: minioadmin
   bucketName: rag-test
-  endpoint: http://112.126.84.219:9000
+  endpoint: http://192.168.10.10:9000
 
 embeddings:
   store:
-    host: 112.126.84.219
-    port: 5432
-    database: vector_store
-    user: postgres
-    password: 123456
+    host: 192.168.10.10
+    port: 5433
+    database: rag_test
+    user: pgvector
+    password: pgvector
 
+# 向量存储配置
+vector:
+  store:
+    table-name: vector_knowledge_document
 # Tavily ??????
 tavily:
   api-key: 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
@@ -63,6 +81,13 @@ tavily:
 grsai:
   nanobanana:
     api-key: sk-763b1007b663430eb27959382d902fee
+
+
+file:
+  parse:
+    api:
+      url: http://47.104.64.223:8000
+
 
 logging:
   level:
@@ -73,3 +98,12 @@ logging:
       modelcontextprotocol:
         client: ERROR
 
+# xxl-job 配置
+xxl:
+  job:
+    enabled: true
+    admin:
+      addresses: http://192.168.10.10:9999/xxl-job-admin # xxl-job-admin 地址，记得改成你自己的
+    accessToken: default_token
+    executor:
+      appName: konwledgeExecutor # 执行器名称

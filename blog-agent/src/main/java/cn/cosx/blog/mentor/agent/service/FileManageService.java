@@ -339,6 +339,21 @@ public class FileManageService {
     }
 
     /**
+     * 从MinIO下载文件并返回字节数组
+     *
+     * @param objectName MinIO对象名称
+     * @return 文件字节数组
+     */
+    public byte[] downloadFileAsBytes(String objectName) {
+        try {
+            return minioService.downloadFileAsBytes(objectName);
+        } catch (Exception e) {
+            log.error("从MinIO下载文件失败: objectName={}", objectName, e);
+            throw new RuntimeException("从MinIO下载文件失败: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * 清理所有文件（用于测试）
      */
     @Transactional(rollbackFor = Exception.class)

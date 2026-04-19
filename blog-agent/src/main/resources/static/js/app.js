@@ -197,8 +197,13 @@ createApp({
                 const validExts = SUPPORTED_FILE_TYPES.extensions;
                 const fileExt = file.name.split('.').pop().toLowerCase();
 
-                if (!validTypes.includes(file.type) && !validExts.includes(fileExt)) {
-                    alert('不支持的文件类型，仅支持 PDF、Word、TXT、PNG、JPG 格式');
+                // md 文件浏览器通常识别为 text/plain，需要特殊处理
+                const isMarkdown = fileExt === 'md';
+                const typeMatch = validTypes.includes(file.type) || (isMarkdown && file.type === 'text/plain');
+                const extMatch = validExts.includes(fileExt);
+
+                if (!typeMatch && !extMatch) {
+                    alert('不支持的文件类型，仅支持 PDF、Word、TXT、Markdown、PNG、JPG 格式');
                     removeFile();
                     return;
                 }

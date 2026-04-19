@@ -1,7 +1,7 @@
 package cn.cosx.blog.mentor.agent.document.entity;
 
+import cn.cosx.blog.mentor.agent.document.enums.DocumentStatus;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -14,47 +14,53 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("knowledge_document")
-public class DocumentEntity extends BaseEntity {
+public class KnowledgeDocument extends BaseEntity {
 
     /**
-     * 文档ID（自增主键）
+     * 文档ID
      */
-    @TableId(value = "doc_id", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
     private Long docId;
 
     /**
      * 文档标题
      */
-    @TableField("doc_title")
     private String docTitle;
 
     /**
      * 上传用户
      */
-    @TableField("upload_user")
     private String uploadUser;
 
     /**
-     * 文档存储URL
+     * 文档URL
      */
-    @TableField("doc_url")
     private String docUrl;
 
     /**
-     * 解析后文档存储URL
+     * 转换后的文档URL
      */
-    @TableField("converted_doc_url")
     private String convertedDocUrl;
 
     /**
-     * 文档状态
+     * 状态：INIT, UPLOADED, CONVERTING, CONVERTED, CHUNKED, VECTOR_STORED
      */
-    @TableField("status")
-    private String status;
+    private DocumentStatus status;
 
     /**
-     * 可见范围权限控制（如角色名称）
+     * 可见范围
      */
-    @TableField("accessible_by")
     private String accessibleBy;
+
+    /**
+     * 文档描述
+     */
+    private String description;
+
+
+    /**
+     * 扩展字段，保存JSON字符串
+     */
+    private String extension;
+
 }
