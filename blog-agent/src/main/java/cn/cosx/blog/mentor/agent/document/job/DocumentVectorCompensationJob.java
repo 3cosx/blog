@@ -63,11 +63,6 @@ public class DocumentVectorCompensationJob {
                 try {
                     log.info("开始处理文档: docId={}, docTitle={}, status={}",
                             document.getDocId(), document.getDocTitle(), document.getStatus());
-
-                    // 2. 执行文档分块
-                    documentChunkService.chunkDocument(document);
-                    log.info("文档分块完成: docId={}", document.getDocId());
-
                     // 3. 执行向量存储
                     vectorStoreService.storeDocumentVectors(document);
                     log.info("文档向量化完成: docId={}", document.getDocId());

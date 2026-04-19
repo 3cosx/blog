@@ -73,8 +73,8 @@ public class AgentController implements InitializingBean {
 
     @GetMapping(value = "/chat/stream", produces = "text/event-stream;charset=UTF-8")
     @Operation(summary = "智能问答", description = "接收用户查询并返回流式响应，使用联网搜索获取信息")
-    public Flux<String> webSearchStream(@RequestParam(required = true) String query,
-                                        @RequestParam(required = true) String conversationId) {
+    public Flux<String> webSearchStream(@RequestParam(value = "query", required = true) String query,
+                                        @RequestParam(value = "conversationId", required = true) String conversationId) {
         log.info("收到网页搜索请求: query={}, conversationId={}", query, conversationId);
 
         if (query == null || query.trim().isEmpty()) {
@@ -96,9 +96,9 @@ public class AgentController implements InitializingBean {
 
     @GetMapping(value = "/file/stream", produces = "text/event-stream;charset=UTF-8")
     @Operation(summary = "文件问答", description = "接收用户查询并返回流式响应，基于上传的文件内容进行问答")
-    public Flux<String> fileStream(@RequestParam(required = true) String query,
-                                   @RequestParam(required = true) String conversationId,
-                                   @RequestParam(required = true) String fileId) {
+    public Flux<String> fileStream(@RequestParam(value = "query", required = true) String query,
+                                   @RequestParam(value = "conversationId", required = true) String conversationId,
+                                   @RequestParam(value = "fileId", required = true) String fileId) {
         log.info("收到文件问答请求: query={}, conversationId={}, fileId={}", query, conversationId, fileId);
 
         if (query == null || query.trim().isEmpty()) {
@@ -125,8 +125,8 @@ public class AgentController implements InitializingBean {
 
     @GetMapping(value = "/pptx/stream", produces = "text/event-stream;charset=UTF-8")
     @Operation(summary = "PPT 生成", description = "接收用户需求并返回流式响应，基于模板驱动生成PPT")
-    public Flux<String> pptxStream(@RequestParam(required = true) String query,
-                                   @RequestParam(required = true) String conversationId) {
+    public Flux<String> pptxStream(@RequestParam(value = "query", required = true) String query,
+                                   @RequestParam(value = "conversationId", required = true) String conversationId) {
         log.info("收到PPT Builder请求: query={}, conversationId={}", query, conversationId);
 
         if (query == null || query.trim().isEmpty()) {
@@ -148,8 +148,8 @@ public class AgentController implements InitializingBean {
 
     @GetMapping(value = "/deep/stream", produces = "text/event-stream;charset=UTF-8")
     @Operation(summary = "深度研究", description = "接收用户查询并返回流式响应，使用计划-执行模式进行深度研究")
-    public Flux<String> deepStream(@RequestParam(required = true) String query,
-                                    @RequestParam(required = true) String conversationId) {
+    public Flux<String> deepStream(@RequestParam(value = "query", required = true) String query,
+                                    @RequestParam(value = "conversationId", required = true) String conversationId) {
         log.info("收到深度研究请求: query={}, conversationId={}", query, conversationId);
 
         if (query == null || query.trim().isEmpty()) {
@@ -171,7 +171,7 @@ public class AgentController implements InitializingBean {
 
     @GetMapping("/stop")
     @Operation(summary = "停止Agent执行", description = "停止指定会话的Agent执行，中断底层调用")
-    public Map<String, Object> stopAgent(@RequestParam String conversationId) {
+    public Map<String, Object> stopAgent(@RequestParam(value = "conversationId") String conversationId) {
         log.info("收到停止请求: conversationId={}", conversationId);
 
         boolean success = taskManager.stopTask(conversationId);

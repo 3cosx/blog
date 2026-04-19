@@ -1,5 +1,8 @@
 package cn.cosx.blog.mentor.agent.tool;
 
+import cn.cosx.blog.mentor.agent.document.entity.KnowledgeDocument;
+import cn.cosx.blog.mentor.agent.document.enums.DocumentStatus;
+import cn.cosx.blog.mentor.agent.document.service.KnowledgeDocumentService;
 import cn.cosx.blog.mentor.agent.entity.record.FileInfo;
 import cn.cosx.blog.mentor.agent.service.EmbeddingService;
 import cn.cosx.blog.mentor.agent.service.FileManageService;
@@ -26,6 +29,59 @@ public class FileContentService {
     @Autowired
     private FileManageService fileManageService;
 
+    @Autowired
+    private KnowledgeDocumentService knowledgeDocumentService;
+
+//    /**
+//     * 加载文件内容或进行RAG检索
+//     * 根据文件的 embed 字段自动选择合适的加载方式：
+//     * - embed=1: 使用RAG语义检索（适用于大文件）
+//     * - embed=0 或 null: 直接加载完整文件内容（适用于小文件）
+//     *
+//     * @param fileId   文件ID
+//     * @param question 用户问题（用于RAG检索）
+//     * @return 文件信息或检索结果
+//     */
+//    @Tool(description = "根据文件ID加载文件内容或进行RAG语义检索。如果文件已向量化(embed=1)则使用语义搜索返回相关片段，否则直接返回完整文件内容。")
+//    public String loadContent(
+//            @ToolParam(description = "文件ID") String fileId,
+//            @ToolParam(description = "用户的问题，用于语义检索（可选）") String question) {
+//        log.info("EXECUTE Tool: loadContent: fileId={}, question={}", fileId, question);
+//
+//        if (fileId == null || fileId.trim().isEmpty()) {
+//            return "文件ID不能为空";
+//        }
+//
+//        try {
+//            // 查询文件信息
+//            var fileInfo = fileManageService.getFileInfo(fileId);
+//
+//            if (fileInfo == null) {
+//                return "文件不存在，文件ID: " + fileId;
+//            }
+//
+//            // 检查文件处理状态
+//            if (fileInfo.getStatus() != FileInfo.FileStatus.SUCCESS) {
+//                return String.format("文件处理中或处理失败，当前状态: %s，文件ID: %s", fileInfo.getStatus(), fileId);
+//            }
+//
+//            // 根据 embed 字段选择加载方式
+//            Integer embed = fileInfo.getEmbed();
+//            if (embed != null && embed == 1) {
+//                // embed=1: 使用RAG语义检索
+//                return retrieveWithRAG(fileId, fileInfo, question);
+//            } else {
+//                // embed=0 或 null: 直接加载完整文件内容
+//                return loadDirectly(fileId, fileInfo);
+//            }
+//
+//        } catch (IllegalArgumentException e) {
+//            return e.getMessage();
+//        } catch (Exception e) {
+//            log.error("加载文件内容失败: fileId={}, question={}", fileId, question, e);
+//            return "加载文件内容失败: " + e.getMessage();
+//        }
+//    }
     /**
      * 加载文件内容或进行RAG检索
      * 根据文件的 embed 字段自动选择合适的加载方式：
@@ -48,24 +104,25 @@ public class FileContentService {
 
         try {
             // 查询文件信息
-            var fileInfo = fileManageService.getFileInfo(fileId);
-            if (fileInfo == null) {
+//            var fileInfo = fileManageService.getFileInfo(fileId);
+            KnowledgeDocument document = knowledgeDocumentService.getById(fileId);
+
+            if (document == null) {
                 return "文件不存在，文件ID: " + fileId;
             }
 
             // 检查文件处理状态
-            if (fileInfo.getStatus() != FileInfo.FileStatus.SUCCESS) {
-                return String.format("文件处理中或处理失败，当前状态: %s，文件ID: %s", fileInfo.getStatus(), fileId);
+            if (document.getStatus() != DocumentStatus.VECTOR_STORED) {
+                return String.format("文件处理中或处理失败，当前状态: %s，文件ID: %s", document.getStatus(), fileId);
             }
 
-            // 根据 embed 字段选择加载方式
-            Integer embed = fileInfo.getEmbed();
-            if (embed != null && embed == 1) {
-                // embed=1: 使用RAG语义检索
-                return retrieveWithRAG(fileId, fileInfo, question);
+            // 根据文件状态选择加载方式
+            if (document.getStatus() == DocumentStatus.VECTOR_STORED) {
+                // 已向量化：使用RAG语义检索
+                return retrieveWithRAG(fileId, document, question);
             } else {
-                // embed=0 或 null: 直接加载完整文件内容
-                return loadDirectly(fileId, fileInfo);
+                // 未向量化：直接加载文件内容
+                return loadDirectly(fileId, document);
             }
 
         } catch (IllegalArgumentException e) {
@@ -76,23 +133,41 @@ public class FileContentService {
         }
     }
 
+//    /**
+//     * 使用RAG语义检索方式加载文件内容
+//     */
+//    private String retrieveWithRAG(String fileId, FileInfo fileInfo, String question) {
+//        if (question == null || question.trim().isEmpty()) {
+//            // 如果没有提供问题，返回提示
+//            return buildResponse(fileId, fileInfo, "请提供具体问题以进行语义检索。", null);
+//        }
+//
+//        // 调用 EmbeddingService 进行 RAG 检索
+//        List<String> results = embeddingService.ragRetrieve(fileId, question);
+//
+//        if (results == null || results.isEmpty()) {
+//            return buildResponse(fileId, fileInfo, "未检索到与问题相关的内容", null);
+//        }
+//
+//        return buildResponse(fileId, fileInfo, "RAG检索", results);
+//    }
     /**
      * 使用RAG语义检索方式加载文件内容
      */
-    private String retrieveWithRAG(String fileId, FileInfo fileInfo, String question) {
+    private String retrieveWithRAG(String fileId, KnowledgeDocument document, String question) {
         if (question == null || question.trim().isEmpty()) {
             // 如果没有提供问题，返回提示
-            return buildResponse(fileId, fileInfo, "请提供具体问题以进行语义检索。", null);
+            return buildResponse(fileId, document, "请提供具体问题以进行语义检索。", null);
         }
 
         // 调用 EmbeddingService 进行 RAG 检索
         List<String> results = embeddingService.ragRetrieve(fileId, question);
 
         if (results == null || results.isEmpty()) {
-            return buildResponse(fileId, fileInfo, "未检索到与问题相关的内容", null);
+            return buildResponse(fileId, document, "未检索到与问题相关的内容", null);
         }
 
-        return buildResponse(fileId, fileInfo, "RAG检索", results);
+        return buildResponse(fileId, document, "RAG检索", results);
     }
 
     /**
@@ -104,6 +179,17 @@ public class FileContentService {
         String contentText = (content != null && !content.trim().isEmpty()) ? content : "该文件没有可识别的内容";
 
         return buildResponse(fileId, fileInfo, contentText, null);
+    }
+
+    /**
+     * 直接加载完整文件内容（KnowledgeDocument版本）
+     */
+    private String loadDirectly(String fileId, KnowledgeDocument document) {
+        // 获取文件内容
+        String content = fileManageService.getFileContent(fileId);
+        String contentText = (content != null && !content.trim().isEmpty()) ? content : "该文件没有可识别的内容";
+
+        return buildResponse(fileId, document, contentText, null);
     }
 
     /**
@@ -128,6 +214,41 @@ public class FileContentService {
             sb.append("相关内容: ").append("\n\n");
             for (int i = 0; i < segments.size(); i++) {
                 sb.append(segments.get(i)).append("\n\n");
+            }
+        } else if (content != null) {
+            // 直接加载内容格式
+            sb.append(content);
+        } else {
+            // 提示信息
+            sb.append("无内容可显示");
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * 统一构建响应格式（KnowledgeDocument版本）
+     *
+     * @param fileId    文件ID
+     * @param document  文档信息
+     * @param content   内容或检索结果
+     * @param segments  检索片段列表（RAG模式）
+     * @return 统一格式的响应字符串
+     */
+    private String buildResponse(String fileId, KnowledgeDocument document, String content, List<String> segments) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== 文档信息 ===\n");
+        sb.append("文档标题: ").append(document.getDocTitle()).append("\n");
+        sb.append("上传用户: ").append(document.getUploadUser()).append("\n");
+        sb.append("文档状态: ").append(document.getStatus()).append("\n");
+
+        sb.append("\n=== 文档内容 ===\n");
+
+        if (segments != null && !segments.isEmpty()) {
+            // RAG检索结果格式
+            sb.append("相关内容: ").append("\n\n");
+            for (String segment : segments) {
+                sb.append(segment).append("\n\n");
             }
         } else if (content != null) {
             // 直接加载内容格式

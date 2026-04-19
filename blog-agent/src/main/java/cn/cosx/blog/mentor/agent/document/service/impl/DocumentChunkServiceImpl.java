@@ -16,12 +16,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.support.TransactionCallback;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static cn.cosx.blog.mentor.agent.document.rag.constant.MetadataKeyConstant.SKIP_EMBEDDING;
 
 /**
  * 文档切分服务实现类
@@ -42,6 +46,9 @@ public class DocumentChunkServiceImpl implements DocumentChunkService {
     @Autowired
     private FileManageService fileManageService;
 
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
     /**
      * 每块最大字符数
      */
@@ -52,6 +59,7 @@ public class DocumentChunkServiceImpl implements DocumentChunkService {
      */
     private static final int OVERLAP = 50;
 
+    //todo 事务优化
     @Override
     @Transactional
     public void chunkDocument(KnowledgeDocument document) {
@@ -79,16 +87,14 @@ public class DocumentChunkServiceImpl implements DocumentChunkService {
                 
                 // 从元数据中获取chunkId，如果没有则生成新的
                 String chunkId = segment.metadata().getString("chunk_id");
-                if (chunkId == null || chunkId.isEmpty()) {
-                    chunkId = cn.cosx.blog.mentor.agent.document.tools.SnowflakeIdGenerator.getInstance().nextIdStr();
-                }
+
                 knowledgeSegment.setChunkId(chunkId);
                 
                 knowledgeSegment.setChunkOrder(i);
                 
                 // 设置状态：标记为跳过embedding的片段状态仍为STORED，但后续不会进行向量化
-                Integer skipEmbedding = segment.metadata().getInteger("skip_embedding");
-                knowledgeSegment.setSkipEmbedding(skipEmbedding != null ? skipEmbedding : 0);
+                Integer skipEmbedding = segment.metadata().getInteger(SKIP_EMBEDDING);
+                knowledgeSegment.setSkipEmbedding(skipEmbedding);
                 knowledgeSegment.setStatus(SegmentStatus.STORED);
                 
                 // 设置元数据（转换为JSON字符串）
@@ -102,23 +108,27 @@ public class DocumentChunkServiceImpl implements DocumentChunkService {
                 knowledgeSegments.add(knowledgeSegment);
             }
 
-            // 5. 批量保存切分片段
-            if (!knowledgeSegments.isEmpty()) {
-                segmentService.saveBatch(knowledgeSegments);
-                log.info("切分片段保存成功: docId={}, 保存数量={}", document.getDocId(), knowledgeSegments.size());
-            }
+            transactionTemplate.execute(obk -> {
+                // 5. 批量保存切分片段
+                if (!knowledgeSegments.isEmpty()) {
+                    segmentService.saveBatch(knowledgeSegments);
+                    log.info("切分片段保存成功: docId={}, 保存数量={}", document.getDocId(), knowledgeSegments.size());
+                }
 
-            // 6. 更新文档状态为 CHUNKED
-            document.setStatus(DocumentStatus.CHUNKED);
-            boolean updateResult = documentService.updateById(document);
-            if (!updateResult) {
-                throw new RuntimeException("更新文档状态为CHUNKED失败: docId=" + document.getDocId());
-            }
-            log.info("文档状态已更新为CHUNKED: docId={}", document.getDocId());
+                // 6. 更新文档状态为 CHUNKED
+                document.setStatus(DocumentStatus.CHUNKED);
+                boolean updateResult = documentService.updateById(document);
+                if (!updateResult) {
+                    throw new RuntimeException("更新文档状态为CHUNKED失败: docId=" + document.getDocId());
+                }
+                log.info("文档状态已更新为CHUNKED: docId={}", document.getDocId());
 
-            // 7. 发布向量存储事件
-            eventPublisher.publishEvent(new VectorStoreEvent(this, document.getDocId()));
-            log.info("已发布向量存储事件: docId={}", document.getDocId());
+                // 7. 发布向量存储事件
+                eventPublisher.publishEvent(new VectorStoreEvent(this, document.getDocId()));
+                log.info("已发布向量存储事件: docId={}", document.getDocId());
+                return null;
+            });
+
 
         } catch (Exception e) {
             log.error("文档切分失败: docId={}, docTitle={}", document.getDocId(), document.getDocTitle(), e);

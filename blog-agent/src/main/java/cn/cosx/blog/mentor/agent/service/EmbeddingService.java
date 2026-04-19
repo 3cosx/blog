@@ -103,7 +103,7 @@ public class EmbeddingService {
             Set<String> seenIds = new HashSet<>();
 
             FilterExpressionBuilder builder = new FilterExpressionBuilder();
-            Filter.Expression filter = builder.eq("fileid", fileId).build();
+            Filter.Expression filter = builder.eq("documentId", fileId).build();
 
             for (Query eq : expandedQueries) {
                 List<Document> docs = vectorStore.similaritySearch(
