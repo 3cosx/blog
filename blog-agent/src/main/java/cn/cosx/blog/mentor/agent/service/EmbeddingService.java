@@ -1,5 +1,8 @@
 package cn.cosx.blog.mentor.agent.service;
 
+import cn.cosx.blog.mentor.agent.document.entity.KnowledgeSegment;
+import cn.cosx.blog.mentor.agent.document.rag.constant.MetadataKeyConstant;
+import cn.cosx.blog.mentor.agent.document.service.KnowledgeSegmentService;
 import cn.cosx.blog.mentor.agent.utils.DynamicPgVectorStoreFactory;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +37,9 @@ public class EmbeddingService {
     @Autowired
     private ChatModel chatModel;
 
+    @Autowired
+    private KnowledgeSegmentService segmentService;
+
 
     private PgVectorStore vectorStore;
 
@@ -64,15 +70,15 @@ public class EmbeddingService {
     /**
      * RAG 检索 - 根据文件ID和问题检索相关文档
      *
-     * @param fileId   文件ID
+     * @param documentId   文件ID
      * @param question 用户问题
      * @return 相关文档内容列表
      */
-    public List<String> ragRetrieve(String fileId, String question) {
-        log.info("RAG 检索开始: fileId={}, question={}", fileId, question);
+    public List<String> ragRetrieve(String documentId, String question) {
+        log.info("RAG 检索开始: fileId={}, question={}", documentId, question);
 
-        if (StringUtils.isBlank(fileId) || StringUtils.isBlank(question)) {
-            log.warn("RAG 检索参数为空: fileId={}, question={}", fileId, question);
+        if (StringUtils.isBlank(documentId) || StringUtils.isBlank(question)) {
+            log.warn("RAG 检索参数为空: fileId={}, question={}", documentId, question);
             return Collections.singletonList("检索参数不能为空");
         }
 
@@ -98,12 +104,12 @@ public class EmbeddingService {
             List<Query> expandedQueries = queryExpander.expand(compressed);
             log.info("扩展后的Query：{}", expandedQueries);
 
-            // 3. 语义向量检索 - 使用 fileid 过滤
-            List<String> results = new ArrayList<>();
+            // 3. 语义向量检索 - 使用 documentId 过滤
+            List<Document> allDocs = new ArrayList<>();
             Set<String> seenIds = new HashSet<>();
 
             FilterExpressionBuilder builder = new FilterExpressionBuilder();
-            Filter.Expression filter = builder.eq("documentId", fileId).build();
+            Filter.Expression filter = builder.eq("documentId", documentId).build();
 
             for (Query eq : expandedQueries) {
                 List<Document> docs = vectorStore.similaritySearch(
@@ -115,16 +121,59 @@ public class EmbeddingService {
 
                 for (Document doc : docs) {
                     if (seenIds.add(doc.getId())) {
-                        results.add(doc.getText());
+                        allDocs.add(doc);
                     }
                 }
             }
 
-            log.info("RAG 检索完成: fileId={}, 返回结果数={}", fileId, results.size());
+            // 4. 收集所有需要查询的 parentChunkId，统一查询数据库
+            Set<String> parentChunkIds = new HashSet<>();
+            for (Document doc : allDocs) {
+                if (doc.getMetadata().containsKey(MetadataKeyConstant.PARENT_CHUNK_ID)) {
+                    parentChunkIds.add(String.valueOf(doc.getMetadata().get(MetadataKeyConstant.PARENT_CHUNK_ID)));
+                }
+            }
+
+            // 5. 批量查询父分段
+            Map<String, String> parentChunkTextMap = new HashMap<>();
+            if (!parentChunkIds.isEmpty()) {
+                log.info("批量查询父分段: parentChunkIds={}", parentChunkIds);
+                List<KnowledgeSegment> parentSegments = segmentService.lambdaQuery()
+                        .in(KnowledgeSegment::getChunkId, parentChunkIds)
+                        .list();
+                for (KnowledgeSegment segment : parentSegments) {
+                    parentChunkTextMap.put(segment.getChunkId(), segment.getText());
+                }
+                log.info("父分段批量查询完成: 查询数量={}, 返回数量={}", parentChunkIds.size(), parentChunkTextMap.size());
+            }
+
+            // 6. 构建返回结果，如果有parentChunkId则使用父分段内容，同一父分段只返回一次
+            List<String> results = new ArrayList<>();
+            Set<String> returnedParentChunkIds = new HashSet<>();
+            for (Document doc : allDocs) {
+                String text = doc.getText();
+                if (doc.getMetadata().containsKey(MetadataKeyConstant.PARENT_CHUNK_ID)) {
+                    String parentChunkId = String.valueOf(doc.getMetadata().get(MetadataKeyConstant.PARENT_CHUNK_ID));
+                    // 同一父分段只返回一次，避免重复
+                    if (returnedParentChunkIds.contains(parentChunkId)) {
+                        log.debug("跳过重复父分段: parentChunkId={}", parentChunkId);
+                        continue;
+                    }
+                    String parentText = parentChunkTextMap.get(parentChunkId);
+                    if (StringUtils.isNotBlank(parentText)) {
+                        text = parentText;
+                        returnedParentChunkIds.add(parentChunkId);
+                        log.debug("使用父分段内容: parentChunkId={}", parentChunkId);
+                    }
+                }
+                results.add(text);
+            }
+
+            log.info("RAG 检索完成: fileId={}, 返回结果数={}", documentId, results.size());
             return results;
 
         } catch (Exception e) {
-            log.error("RAG 检索失败: fileId={}, question={}", fileId, question, e);
+            log.error("RAG 检索失败: fileId={}, question={}", documentId, question, e);
             return Collections.singletonList("RAG 检索失败: " + e.getMessage());
         }
     }

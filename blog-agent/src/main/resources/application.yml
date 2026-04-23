@@ -45,21 +45,26 @@ spring:
       enabled: true
       max-file-size: 50MB
       max-request-size: 50MB
+  neo4j:
+    uri: bolt://192.168.10.10:7687
+    authentication:
+      username: neo4j
+      password: neo4j666
 
 mineru:
   api-key: eyJ0eXBlIjoiSldUIiwiYWxnIjoiSFM1MTIifQ.eyJqdGkiOiIxNzEwMDgyMyIsInJvbCI6IlJPTEVfUkVHSVNURVIiLCJpc3MiOiJPcGVuWExhYiIsImlhdCI6MTc3NjM1MTEzNywiY2xpZW50SWQiOiJsa3pkeDU3bnZ5MjJqa3BxOXgydyIsInBob25lIjoiIiwib3BlbklkIjpudWxsLCJ1dWlkIjoiYjg4Njk5NWQtMzU2Zi00N2U1LTljNWUtYTNjMDJlYWU3NjNhIiwiZW1haWwiOiIiLCJleHAiOjE3ODQxMjcxMzd9.dQKm_52XN6GfJOei6V_9XlmECaopLvGbzO5L26NEh2RVHSRe7NeiI9A06iTIF3HfOTvDmn66NXmSRfQd4_9TAA  # 请替换为实际的API Key
   api-url: https://mineru.net
   model-version: vlm
-  use-async-api: false  # 设置为 true 使用远程异步任务 API，false 使用同步文件解析 API
+  use-async-api: true  # 设置为 true 使用远程异步任务 API，false 使用同步文件解析 API
   connect-timeout: 60000
   response-timeout: 300000
 
 minio:
-  url: http://192.168.10.10:9000
-  accessKey: minioadmin
-  secretKey: minioadmin
+  url: http://112.126.84.219:9001/
+  accessKey: admin
+  secretKey: admin123456
   bucketName: rag-test
-  endpoint: http://192.168.10.10:9000
+  endpoint: http://112.126.84.219:9000/
 
 embeddings:
   store:

@@ -4,6 +4,7 @@ import cn.cosx.blog.mentor.agent.document.entity.KnowledgeDocument;
 import cn.cosx.blog.mentor.agent.document.enums.DocumentStatus;
 import org.springframework.ai.content.Media;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
@@ -54,8 +55,8 @@ public class FileProcessService {
 
     private final Tika tika = new Tika();
 
-    private static final String MINERU_API_URL = "https://mineru.net/api/v4/extract/task";
-    private static final String MINERU_RESULT_URL = "https://mineru.net/api/v4/extract/result/";
+    private static final String MINERU_API_URL = "https://mineru.net/api/v1/agent/parse/url";
+    private static final String MINERU_RESULT_URL = "https://mineru.net/api/v1/agent/parse/";
     private static final String MINERU_FILE_PARSE_URL = "https://mineru.net/api/v4/extract/file_parse";
     private static final String CONVERTED_FILE_DIR = "converted/";
     private static final int MAX_POLL_ATTEMPTS = 60; // 最大轮询次数
@@ -70,7 +71,7 @@ public class FileProcessService {
     @Value("${mineru.model-version}")
     private String modelVersion;
 
-    @Value("${mineru.use-async-api:false}")
+    @Value("${mineru.use-async-api}")
     private boolean useAsyncApi;
 
     @Value("${spring.ai.openai.api-key}")
@@ -95,35 +96,6 @@ public class FileProcessService {
     private cn.cosx.blog.mentor.agent.utils.FileStorageService fileStorageService;
 
 
-
-    /**
-     * 处理文档转换 - Markdown 格式
-     * 1. 从 MinIO 下载文件
-     * 2. 调用文档解析接口获取md/zip
-     * 3. 转换后的文档保存在minio上
-     * 3. 更新文档状态和转换后的 URL
-     *
-     * @param document 文档对象
-     */
-    public void processDocument(KnowledgeDocument document, InputStream inputStream) {
-        // 使用 Tika 检测文件 MIME 类型
-        try {
-            String detectedType = tika.detect(inputStream);
-            log.info("Tika 检测到文件类型: {}, 文档标题: {}", detectedType, document.getDocTitle());
-
-            if ("application/pdf".equals(detectedType)) {
-                log.info("检测到 PDF 文件，开始处理: {}", document.getDocTitle());
-                processPdfDocument(document, inputStream);
-            } else {
-                // 其他类型走默认流程
-                processDocumentToMarkdownFromZip(document, inputStream);
-            }
-        } catch (Exception e) {
-            log.error("Tika 检测文件类型失败，文档标题: {}", document.getDocTitle(), e);
-            // 检测失败时走默认流程
-            processDocumentToMarkdownFromZip(document, inputStream);
-        }
-    }
 
     /**
      * 处理 PDF 文档
@@ -430,55 +402,6 @@ public class FileProcessService {
     }
 
     /**
-     * 调用文件解析接口
-     * 使用 Apache HttpClient 5 替代 HttpURLConnection，提供更好的超时控制和连接管理
-     *
-     * @param fileName   文件名
-     * @param fileStream 文件输入流
-     * @return 解析结果
-     */
-    private String parseDocumentToMarkdown(String fileName, InputStream fileStream) {
-        String url = fileParseApiUrl + "/file_parse";
-
-        // 配置请求超时
-        RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(Timeout.ofMilliseconds(connectTimeout)).setResponseTimeout(Timeout.ofMilliseconds(responseTimeout)).build();
-
-        try (CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build()) {
-
-            HttpPost httpPost = new HttpPost(url);
-            httpPost.setHeader("Accept", "application/json");
-
-            // 构建 multipart 请求体
-            org.apache.hc.core5.http.HttpEntity multipartEntity = MultipartEntityBuilder.create().addBinaryBody("files", fileStream, org.apache.hc.core5.http.ContentType.APPLICATION_OCTET_STREAM, fileName).addTextBody("backend", "pipeline").addTextBody("response_format_zip", "false").addTextBody("return_images", "false").addTextBody("return_model_output", "false").addTextBody("return_middle_json", "false").build();
-
-            httpPost.setEntity(multipartEntity);
-
-            log.info("开始调用文件解析接口: {}", url);
-
-            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
-                int statusCode = response.getCode();
-                log.info("文件解析接口响应状态码: {}", statusCode);
-
-                org.apache.hc.core5.http.HttpEntity responseEntity = response.getEntity();
-                String responseBody = responseEntity != null ? EntityUtils.toString(responseEntity, "UTF-8") : "";
-
-                if (statusCode == 200) {
-                    log.info("文件解析接口调用成功，响应体长度: {}", responseBody.length());
-                    return responseBody;
-                } else {
-                    log.error("文件解析接口调用失败，状态码: {}, 响应: {}", statusCode, responseBody);
-                    throw new RuntimeException("文件解析接口调用失败: HTTP " + statusCode + ", " + responseBody);
-                }
-            }
-        } catch (Exception e) {
-            log.error("调用文件解析接口异常", e);
-            throw new RuntimeException("调用文件解析接口失败: " + e.getMessage(), e);
-        } finally {
-            closeQuietly(fileStream);
-        }
-    }
-
-    /**
      * 调用文件解析接口，获取 ZIP 格式响应
      * 使用 Apache HttpClient 5，支持流式下载大文件
      *
@@ -670,12 +593,11 @@ public class FileProcessService {
                     .build();
 
             try (CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build()) {
-                HttpPost httpPost = new HttpPost(resultUrl);
-                httpPost.setHeader("Authorization", "Bearer " + mineruApiKey);
-                httpPost.setHeader("Content-Type", "application/json");
-                httpPost.setHeader("Accept", "*/*");
+                HttpGet httpGet = new HttpGet(resultUrl);
+                httpGet.setHeader("Authorization", "Bearer " + mineruApiKey);
+                httpGet.setHeader("Accept", "*/*");
 
-                try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                     int statusCode = response.getCode();
                     String responseBody = EntityUtils.toString(response.getEntity(), "UTF-8");
                     
@@ -685,15 +607,32 @@ public class FileProcessService {
                         JsonNode responseJson = mapper.readTree(responseBody);
                         if (responseJson.get("code").asInt() == 0) {
                             JsonNode data = responseJson.get("data");
-                            String status = data.get("status").asText();
-                            
-                            if ("completed".equals(status)) {
-                                // 任务完成，返回结果 URL
-                                return data.get("result_url").asText();
-                            } else if ("failed".equals(status)) {
-                                throw new RuntimeException("任务处理失败: " + data.get("error_msg").asText());
+                            if (data == null) {
+                                log.warn("轮询任务结果响应 data 为空，响应体: {}", responseBody);
+                                throw new RuntimeException("轮询任务结果失败: 响应 data 字段为空");
                             }
-                            // 任务仍在处理中，继续轮询
+                            JsonNode stateNode = data.get("state");
+                            if (stateNode == null) {
+                                log.warn("轮询任务结果响应 state 为空，响应体: {}", responseBody);
+                                throw new RuntimeException("轮询任务结果失败: 响应 state 字段为空");
+                            }
+                            String state = stateNode.asText();
+
+                            if ("done".equals(state)) {
+                                // 任务完成，返回 ZIP 地址
+                                JsonNode fullZipUrlNode = data.get("full_zip_url");
+                                if (fullZipUrlNode == null || fullZipUrlNode.asText().isEmpty()) {
+                                    // ZIP 还未生成，继续轮询
+                                    log.info("任务完成但 full_zip_url 还未生成，继续等待...");
+                                } else {
+                                    return fullZipUrlNode.asText();
+                                }
+                            } else if ("failed".equals(state)) {
+                                String errorMsg = data.has("err_msg") ? data.get("err_msg").asText() : "未知错误";
+                                throw new RuntimeException("任务处理失败: " + errorMsg);
+                            }
+                            // 任务仍在处理中（pending/running/converting），继续轮询
+                            log.info("任务状态: {}，继续等待...", state);
                         } else {
                             throw new RuntimeException("轮询任务结果失败: " + responseJson.get("msg").asText());
                         }

@@ -57,6 +57,7 @@ public class DocumentController {
                 accessibleBy = "public";
             }
 
+
             KnowledgeDocument document = documentUploadService.uploadDocument(file, docTitle, uploadUser, accessibleBy);
             return BaseResult.newSuccess(document);
 

@@ -17,6 +17,7 @@
         <module>blog-gateway</module>
         <module>blog-business</module>
         <module>blog-agent</module>
+        <module>blog-knowledge</module>
     </modules>
 
     <properties>
