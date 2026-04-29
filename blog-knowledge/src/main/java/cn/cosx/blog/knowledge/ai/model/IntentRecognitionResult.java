@@ -1,4 +1,4 @@
-package cn.hollis.llm.mentor.know.engine.ai.model;
+package cn.cosx.blog.knowledge.ai.model;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 

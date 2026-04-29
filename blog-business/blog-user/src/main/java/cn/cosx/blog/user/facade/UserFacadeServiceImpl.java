@@ -14,6 +14,9 @@ import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @DubboService(version = "1.0.0")
 public class UserFacadeServiceImpl implements UserFacadeService {
 
@@ -64,5 +67,22 @@ public class UserFacadeServiceImpl implements UserFacadeService {
     @Override
     public Response<Boolean> updateLastLoginTime(String userId) {
         return null;
+    }
+
+    @Override
+    public Response<List<UserInfo>> queryUserByIds(List<String> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return Response.of(List.of());
+        }
+
+        List<User> users = userService.lambdaQuery()
+                .in(User::getId, userIds)
+                .list();
+
+        List<UserInfo> userInfos = users.stream()
+                .map(UserConverter.INSTANCE::user2UserInfo)
+                .collect(Collectors.toList());
+
+        return Response.of(userInfos);
     }
 }

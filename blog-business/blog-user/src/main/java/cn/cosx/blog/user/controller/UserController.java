@@ -35,9 +35,9 @@ public class UserController {
 
     @PostMapping("/getUserInfo")
     public Result<UserInfo> getUserInfo() {
-        String userId =(String) StpUtil.getLoginId();
+        String userId = (String) StpUtil.getLoginId();
         User user = userService.findById(userId);
-        if(user == null) {
+        if (user == null) {
             throw new UserException(UserErrorCodeEnum.USER_NOT_EXIST);
         }
         UserInfo userInfo = UserConverter.INSTANCE.user2UserInfo(user);
@@ -47,16 +47,16 @@ public class UserController {
 
     @PostMapping("/modifyUserInfo")
     public Result<Boolean> modifyUserInfo(@RequestBody UserModifyParam param) {
-        String userId =(String) StpUtil.getLoginId();
+        String userId = (String) StpUtil.getLoginId();
         User user = userService.findById(userId);
-        if(user == null) {
+        if (user == null) {
             throw new UserException(UserErrorCodeEnum.USER_NOT_EXIST);
         }
         Boolean result = userService.modify(param);
         return Result.success(result);
     }
 
-@PostMapping("/auth")
+    @PostMapping("/auth")
     public Result<Boolean> auth(@Valid @RequestBody UserAuthParam param) {
         String userId = (String) StpUtil.getLoginId();
         User user = userService.findById(userId);
@@ -80,3 +80,4 @@ public class UserController {
         Boolean result = userProfileService.update(param);
         return Result.success(result);
     }
+}

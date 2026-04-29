@@ -9,21 +9,35 @@ import java.util.List;
 public interface CommentService extends IService<Comment> {
 
     /**
-     * 获取文章的评论列表（树形结构）
+     * 获取文章下所有一级评论（分页）
      *
      * @param articleId 文章ID
-     * @return 评论列表（顶层评论及其子评论）
+     * @param offset    偏移量
+     * @param limit     每页数量
+     * @return 一级评论列表
      */
-    List<CommentInfo> getComments(Long articleId);
+    List<CommentInfo> getRootComments(Long articleId, Integer offset, Integer limit);
 
     /**
-     * 添加评论
+     * 根据topId获取该楼所有评论（一次性查询，不递归）
      *
-     * @param articleId 文章ID
-     * @param userId    用户ID
-     * @param content   评论内容
-     * @param parentId  父评论ID（可为null）
-     * @return 评论信息
+     * @param topId 根评论ID
+     * @return 该楼所有评论（按时间正序）
      */
-    Comment addComment(Long articleId, Long userId, String content, Long parentId);
+    List<CommentInfo> getCommentsByTopId(Long topId);
+
+    /**
+     * 发布一级评论
+     */
+    Comment addRootComment(Long articleId, Long userId, String content);
+
+    /**
+     * 回复评论
+     *
+     * @param topId      根评论ID
+     * @param pid        直接回复的评论ID
+     * @param userId     回复用户ID
+     * @param content    评论内容
+     */
+    Comment addReply(Long topId, Long pid, Long userId, String content);
 }

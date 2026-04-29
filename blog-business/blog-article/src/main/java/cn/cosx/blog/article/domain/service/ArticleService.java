@@ -11,13 +11,13 @@ import java.util.List;
 public interface ArticleService extends IService<Article> {
 
     /**
-     * 分页查询已发布的文章
+     * 根据游标分页查询已发布的文章
      *
-     * @param pageNum  页码
+     * @param lastId   上一次查询的最大ID，null表示第一页
      * @param pageSize 每页数量
-     * @return 分页文章列表
+     * @return 文章列表
      */
-    Page<ArticleListInfo> pageQuery(Integer pageNum, Integer pageSize);
+    List<ArticleListInfo> pageQuery(Long lastId, Integer pageSize);
 
     /**
      * 获取文章详情

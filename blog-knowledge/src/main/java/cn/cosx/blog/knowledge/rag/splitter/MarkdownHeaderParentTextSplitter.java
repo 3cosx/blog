@@ -1,4 +1,4 @@
-package cn.cosx.blog.knowledge.document.rag.splitter;
+package cn.cosx.blog.knowledge.rag.splitter;
 
 
 import cn.cosx.blog.knowledge.common.snow.SnowflakeIdGenerator;
@@ -10,7 +10,7 @@ import dev.langchain4j.data.segment.TextSegment;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static cn.cosx.blog.knowledge.document.rag.constant.MetadataKeyConstant.*;
+import static cn.cosx.blog.knowledge.rag.constant.MetadataKeyConstant.*;
 
 
 /**
@@ -111,21 +111,22 @@ public class MarkdownHeaderParentTextSplitter implements DocumentSplitter {
         return result;
     }
 
+
     /**
-     * 简化版分割方法，不保留元数据
+     * 分割方法，保留元数据
      *
      * @param text 待分割的文本
+     * @param baseMetadata 基础元数据
      * @return 分割后的文本片段列表
      */
-
-    public List<TextSegment> splitText(String text) {
+    public List<TextSegment> splitText(String text, Map<String, Object> baseMetadata) {
         // 移除文本中所有空行
         String filteredText = Arrays.stream(text.split("\n"))
                 .filter(line -> !line.trim().isEmpty())
                 .collect(Collectors.joining("\n"));
 
         List<TextSegment> result = new ArrayList<>();
-        List<DocumentWithMetadata> segments = splitWithMetadata(filteredText, new HashMap<>());
+        List<DocumentWithMetadata> segments = splitWithMetadata(filteredText, baseMetadata);
         for (DocumentWithMetadata segment : segments) {
             result.add(new TextSegment(segment.getContent(), Metadata.from(segment.getMetadata())));
         }

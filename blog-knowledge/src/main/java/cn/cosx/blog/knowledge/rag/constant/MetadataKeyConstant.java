@@ -1,4 +1,4 @@
-package cn.cosx.blog.knowledge.document.rag.constant;
+package cn.cosx.blog.knowledge.rag.constant;
 
 /**
  * 元数据的键常量

@@ -1,4 +1,4 @@
-package cn.cosx.blog.knowledge.document.rag.controller;
+package cn.cosx.blog.knowledge.rag.controller;
 
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.embedding.Embedding;
@@ -14,8 +14,7 @@ import dev.langchain4j.store.embedding.filter.Filter;
 import org.apache.groovy.util.Maps;
 import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -29,12 +28,12 @@ public class KnowEngineController {
 
     @Autowired
     private OpenAiEmbeddingModel openAiEmbeddingModel;
-    
+
     @Autowired
     private RestClient restClient;
 
-    @RequestMapping("/adder")
-    public String adder(String query) throws IOException {
+    @GetMapping("/adder")
+    public String adder(@RequestParam("query") String query) throws IOException {
 
         EmbeddingStore<TextSegment> embeddingStore = ElasticsearchEmbeddingStore.builder()
                 .restClient(restClient)
@@ -59,6 +58,10 @@ public class KnowEngineController {
                         .queryEmbedding(queryEmbedding)
                         .filter(version)
                         .build());
+
+        if (relevant.matches().isEmpty()) {
+            return "No matching results found";
+        }
 
         EmbeddingMatch<TextSegment> embeddingMatch = relevant.matches().get(0);
 

@@ -1,4 +1,4 @@
-package cn.cosx.blog.knowledge.ai;
+package cn.cosx.blog.knowledge.rag.modules;
 
 import cn.cosx.blog.knowledge.chat.service.IChatMessageService;
 import dev.langchain4j.model.chat.ChatModel;

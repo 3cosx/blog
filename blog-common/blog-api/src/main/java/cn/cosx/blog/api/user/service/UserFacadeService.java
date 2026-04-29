@@ -7,6 +7,8 @@ import cn.cosx.blog.api.user.response.UserQueryResponse;
 import cn.cosx.blog.api.user.vo.UserInfo;
 import cn.cosx.blog.base.response.Response;
 
+import java.util.List;
+
 /**
  * 用户服务 Dubbo 接口
  *
@@ -50,4 +52,12 @@ public interface UserFacadeService {
 
 
     Response<UserInfo> register(UserRegisterRequest request);
+
+    /**
+     * 批量查询用户信息
+     *
+     * @param userIds 用户ID列表
+     * @return 用户信息列表
+     */
+    Response<List<UserInfo>> queryUserByIds(List<String> userIds);
 }

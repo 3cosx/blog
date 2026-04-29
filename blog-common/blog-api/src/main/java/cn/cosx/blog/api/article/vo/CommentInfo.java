@@ -9,9 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 评论信息VO
- *
- * @author cosx
+ * 评论信息VO（楼中楼扁平化设计）
  */
 @Getter
 @Setter
@@ -21,7 +19,7 @@ public class CommentInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
+     * 评论ID
      */
     private Long id;
 
@@ -51,9 +49,24 @@ public class CommentInfo implements Serializable {
     private String content;
 
     /**
-     * 父评论ID
+     * 父评论ID，0表示一级评论
      */
-    private Long parentId;
+    private Long pid;
+
+    /**
+     * 根评论ID
+     */
+    private Long topId;
+
+    /**
+     * 评论层级，1=一级评论
+     */
+    private Integer level;
+
+    /**
+     * 回复数量（一级评论专用）
+     */
+    private Integer replyCount;
 
     /**
      * 创建时间

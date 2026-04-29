@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.cosx.blog.article.infrastructure.mapper.ArticleMapper">
+
+    <resultMap id="BaseResultMap" type="cn.cosx.blog.article.domain.entity.Article">
+        <id column="id" property="id"/>
+        <result column="author_id" property="authorId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="cover_image_url" property="coverImageUrl"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="status" property="status"/>
+        <result column="deleted" property="deleted"/>
+        <result column="lock_version" property="lockVersion"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, author_id, title, content, cover_image_url,
+        view_count, like_count, comment_count, status,
+        deleted, lock_version, create_time, update_time
+    </sql>
+
+    <!-- 根据游标分页查询文章 -->
+    <select id="selectByCursor" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM article
+        WHERE deleted = 0 AND status = #{status}
+        <if test="lastId != null">
+            AND id &lt; #{lastId}
+        </if>
+        ORDER BY id DESC
+        LIMIT #{pageSize}
+    </select>
+
+</mapper>

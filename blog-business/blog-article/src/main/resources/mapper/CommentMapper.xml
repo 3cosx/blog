@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.cosx.blog.article.infrastructure.mapper.CommentMapper">
+
+    <resultMap id="BaseResultMap" type="cn.cosx.blog.article.domain.entity.Comment">
+        <id column="id" property="id"/>
+        <result column="article_id" property="articleId"/>
+        <result column="user_id" property="userId"/>
+        <result column="content" property="content"/>
+        <result column="pid" property="pid"/>
+        <result column="top_id" property="topId"/>
+        <result column="level" property="level"/>
+        <result column="reply_count" property="replyCount"/>
+        <result column="deleted" property="deleted"/>
+        <result column="lock_version" property="lockVersion"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, article_id, user_id, content, pid, top_id, level, reply_count,
+        deleted, lock_version, create_time, update_time
+    </sql>
+
+    <!-- 获取文章下所有一级评论（分页） -->
+    <select id="selectRootComments" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM comment
+        WHERE deleted = 0 AND article_id = #{articleId} AND pid = 0
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 根据topId获取该楼所有子评论（一次性查询，不递归） -->
+    <select id="selectCommentsByTopId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM comment
+        WHERE deleted = 0 AND top_id = #{topId}
+        ORDER BY create_time ASC
+    </select>
+
+    <!-- 批量更新一级评论的回复数量 -->
+    <update id="batchUpdateReplyCount">
+        UPDATE comment
+        SET reply_count = (
+            SELECT COUNT(*) FROM (SELECT id FROM comment WHERE deleted = 0 AND top_id = #{topId} AND pid != 0) AS temp
+        )
+        WHERE id = #{topId}
+    </update>
+
+</mapper>

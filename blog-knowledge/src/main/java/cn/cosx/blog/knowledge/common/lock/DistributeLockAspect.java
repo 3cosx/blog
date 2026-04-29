@@ -1,4 +1,4 @@
-package cn.hollis.llm.mentor.know.engine.infra.lock;
+package cn.cosx.blog.knowledge.common.lock;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

@@ -1,6 +1,6 @@
-package cn.cosx.blog.mentor.agent.document.entity;
+package cn.cosx.blog.knowledge.document.entity;
 
-import cn.cosx.blog.mentor.agent.document.enums.SegmentStatus;
+import cn.cosx.blog.knowledge.document.enums.SegmentStatus;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;

@@ -1,4 +1,4 @@
-package cn.hollis.llm.mentor.know.engine.infra.lock;
+package cn.cosx.blog.knowledge.common.lock;
 
 /**
  * 分布式锁异常

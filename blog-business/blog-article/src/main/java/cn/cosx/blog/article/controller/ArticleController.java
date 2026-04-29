@@ -1,14 +1,18 @@
 package cn.cosx.blog.article.controller;
 
+import cn.cosx.blog.api.article.request.ArticleCreateRequest;
+import cn.cosx.blog.api.article.request.ArticleListRequest;
+import cn.cosx.blog.api.article.request.CommentCreateRequest;
+import cn.cosx.blog.api.article.request.CommentListRequest;
 import cn.cosx.blog.api.article.vo.ArticleDetailInfo;
 import cn.cosx.blog.api.article.vo.ArticleListInfo;
 import cn.cosx.blog.api.article.vo.CommentInfo;
 import cn.cosx.blog.article.domain.entity.Article;
 import cn.cosx.blog.article.domain.service.ArticleService;
 import cn.cosx.blog.article.domain.service.CommentService;
+import cn.cosx.blog.article.infrastructure.oss.OssTemplate;
 import cn.cosx.blog.base.result.Result;
 import cn.dev33.satoken.stp.StpUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,13 +29,15 @@ public class ArticleController {
     @Resource
     private CommentService commentService;
 
+    @Resource
+    private OssTemplate ossTemplate;
+
     /**
      * 获取文章列表（公开）
      */
     @GetMapping("/list")
-    public Result<Page<ArticleListInfo>> list(@RequestParam(defaultValue = "1") Integer pageNum,
-                                               @RequestParam(defaultValue = "10") Integer pageSize) {
-        return Result.success(articleService.pageQuery(pageNum, pageSize));
+    public Result<List<ArticleListInfo>> list(ArticleListRequest request) {
+        return Result.success(articleService.pageQuery(request.getLastId(), request.getPageSize()));
     }
 
     /**
@@ -43,21 +49,53 @@ public class ArticleController {
     }
 
     /**
-     * 获取文章评论（公开）
+     * 获取文章一级评论列表（分页）
      */
     @GetMapping("/{id}/comments")
-    public Result<List<CommentInfo>> comments(@PathVariable Long id) {
-        return Result.success(commentService.getComments(id));
+    public Result<List<CommentInfo>> comments(@PathVariable Long id, CommentListRequest request) {
+        return Result.success(commentService.getRootComments(id, request.getOffset(), request.getLimit()));
+    }
+
+    /**
+     * 获取某楼所有评论（一次性查询，不递归）
+     */
+    @GetMapping("/{id}/comments/{topId}")
+    public Result<List<CommentInfo>> buildingComments(@PathVariable Long id, @PathVariable Long topId) {
+        return Result.success(commentService.getCommentsByTopId(topId));
+    }
+
+    /**
+     * 发布评论或回复（需登录）
+     */
+    @PostMapping("/comment")
+    public Result<Long> addComment(@RequestBody CommentCreateRequest request) {
+        StpUtil.checkLogin();
+        Long userId = Long.parseLong((String) StpUtil.getLoginId());
+
+        // 一级评论
+        if (request.getPid() == null || request.getPid() == 0) {
+            return Result.success(commentService.addRootComment(request.getArticleId(), userId, request.getContent()).getId());
+        }
+
+        // 二级及以上评论
+        return Result.success(commentService.addReply(request.getTopId(), request.getPid(), userId, request.getContent()).getId());
     }
 
     /**
      * 创建文章（需登录）
      */
     @PostMapping("/create")
-    public Result<Long> create(@RequestBody Article article) {
+    public Result<Long> create(@RequestBody ArticleCreateRequest request) {
         StpUtil.checkLogin();
         Long userId = Long.parseLong((String) StpUtil.getLoginId());
+
+        Article article = new Article();
+        article.setTitle(request.getTitle());
+        article.setContent(request.getContent());
+        article.setCoverImageUrl(request.getCoverImageUrl());
         article.setAuthorId(userId);
+        article.setStatus(request.getStatus());
+
         Article created = articleService.createArticle(article);
         return Result.success(created.getId());
     }
@@ -107,7 +145,7 @@ public class ArticleController {
     @PostMapping("/image/upload")
     public Result<String> uploadImage(@RequestParam("file") MultipartFile file) {
         StpUtil.checkLogin();
-        // TODO: 实现图片上传到云存储，返回URL
-        return Result.success("https://your-oss-url.com/" + file.getOriginalFilename());
+        String url = ossTemplate.uploadImage(file);
+        return Result.success(url);
     }
 }

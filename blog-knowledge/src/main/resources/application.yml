@@ -42,6 +42,11 @@ spring:
       password: 123456
       ssl:
         enabled: true
+  neo4j:
+    uri: bolt://192.168.10.10:7687
+    authentication:
+      username: neo4j
+      password: neo4j666
   redis:
     redisson:
       config: |
@@ -51,10 +56,10 @@ spring:
           timeout: 3000
           retryAttempts: 3
           retryInterval: 1500
-          password: knowengine
+          password: 123456
           subscriptionsPerConnection: 5
           clientName: null
-          address: "redis://localhost:6379"
+          address: "redis://192.168.10.10:6379"
           subscriptionConnectionMinimumIdleSize: 1
           subscriptionConnectionPoolSize: 50
           connectionMinimumIdleSize: 24
@@ -66,13 +71,13 @@ spring:
         codec: !<org.redisson.codec.JsonJacksonCodec> {}
         transportMode: "NIO"
 
-# MyBatis-Plus 配置
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  mapper-locations: classpath*:/mapper/**/*.xml
 
+# LangChain4j 配置
 langchain4j:
+  neo4j:
+    uri: bolt://192.168.10.10:7687
+    username: neo4j
+    password: neo4j666
   open-ai:
     chat-model:
       api-key: @dashscope.api.key@
@@ -94,42 +99,35 @@ elasticsearch:
   api-key: @dashscope.api.key@
   dimensions: 1536
 
+
 minio:
-  url: http://112.126.84.219:9001/
+  url: http://112.126.84.219:9000/
   accessKey: admin
   secretKey: admin123456
   bucketName: rag-test
-  endpoint: http://112.126.84.219:9000/
-
-https://mineru:
-  net/api/v4/extract/task:
+  endpoint: http://112.126.84.219:9000
 # 文件解析服务配置
-file:
-  parse:
-    api:
-      url: http://47.104.64.223:8000
+mineru:
+  url: https://mineru.net/api/v4/extract/task
+  token: eyJ0eXBlIjoiSldUIiwiYWxnIjoiSFM1MTIifQ.eyJqdGkiOiIxNzEwMDgyMyIsInJvbCI6IlJPTEVfUkVHSVNURVIiLCJpc3MiOiJPcGVuWExhYiIsImlhdCI6MTc3NjM1MTEzNywiY2xpZW50SWQiOiJsa3pkeDU3bnZ5MjJqa3BxOXgydyIsInBob25lIjoiIiwib3BlbklkIjpudWxsLCJ1dWlkIjoiYjg4Njk5NWQtMzU2Zi00N2U1LTljNWUtYTNjMDJlYWU3NjNhIiwiZW1haWwiOiIiLCJleHAiOjE3ODQxMjcxMzd9.dQKm_52XN6GfJOei6V_9XlmECaopLvGbzO5L26NEh2RVHSRe7NeiI9A06iTIF3HfOTvDmn66NXmSRfQd4_9TAA
+
+# 临时文件目录
+temp:
+  dir: /tmp/knowledge
+
+# 禁用不需要的健康检查
+management:
+  health:
+    elasticsearch:
+      enabled: false
+    neo4j:
+      enabled: false
 
 # XXL-Job 配置
 xxl:
   job:
     admin:
-      addresses: http://192.168.10.10:8080/xxl-job-admin
+      addresses: http://192.168.10.10:8080/xxl-job-admin # xxl-job-admin 地址，记得改成你自己的
     accessToken: default_token
     executor:
-      appname: konwledgeExecutor
-
-document:
-  processor:
-    temp-dir: ${java.io.tmpdir}/knowledge-document
-    cleanup-after-process: true
-  mineru:
-    extract-url: ${file.parse.api.url}/api/v4/extract/task
-    file-param-name: file
-    response-format-param-name: output_format
-    response-format: zip
-  vision:
-    enabled: true
-    api-key: ${langchain4j.open-ai.chat-model.api-key}
-    base-url: ${langchain4j.open-ai.chat-model.base-url}
-    model-name: qwen-vl-max-latest
-    prompt: 请用一句简洁准确的中文描述图片的核心内容，不要带序号，不要输出“这是一张图”之类的前缀。
+      appname: konwledgeExecutor # 执行器名称

@@ -1,4 +1,4 @@
-package cn.cosx.blog.mentor.agent.document.enums;
+package cn.cosx.blog.knowledge.document.enums;
 
 public enum DocumentStatus {
 

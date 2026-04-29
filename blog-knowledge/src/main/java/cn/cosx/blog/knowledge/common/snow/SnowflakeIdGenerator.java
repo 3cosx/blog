@@ -1,4 +1,4 @@
-package cn.cosx.blog.mentor.agent.document.tools;
+package cn.cosx.blog.knowledge.common.snow;
 
 /**
  * 雪花算法ID生成器

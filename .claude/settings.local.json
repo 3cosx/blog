@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find . -name \"*.java\" -exec grep -l \"Neo4jEmbeddingStore\" {} \\\\;)",
+      "WebSearch",
+      "Bash(mvn dependency:tree)",
+      "Bash(jar -tf ~/.m2/repository/dev/langchain4j/langchain4j-core/1.11.0/langchain4j-core-1.11.0.jar)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(mvn compile *)"
+    ]
+  }
+}

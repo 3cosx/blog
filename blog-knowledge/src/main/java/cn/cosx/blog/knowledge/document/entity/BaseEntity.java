@@ -1,7 +1,8 @@
-package cn.cosx.blog.mentor.agent.document.entity;
+package cn.cosx.blog.knowledge.document.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +25,7 @@ public abstract class BaseEntity {
     /**
      * 更新时间
      */
-
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
     /**

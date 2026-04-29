@@ -1,4 +1,4 @@
-package cn.cosx.blog.knowledge.document.common;
+package cn.cosx.blog.knowledge.common;
 
 import java.io.Serializable;
 

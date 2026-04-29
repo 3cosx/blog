@@ -16,17 +16,16 @@ import cn.cosx.blog.article.infrastructure.mapper.ArticleLikeMapper;
 import cn.cosx.blog.article.infrastructure.mapper.ArticleMapper;
 import cn.cosx.blog.base.response.Response;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -46,27 +45,23 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private final UserFacadeService userFacadeService;
 
     @Override
-    public Page<ArticleListInfo> pageQuery(Integer pageNum, Integer pageSize) {
-        Page<Article> page = new Page<>(pageNum, pageSize);
-        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Article::getStatus, 1).orderByDesc(Article::getCreateTime);
+    public List<ArticleListInfo> pageQuery(Long lastId, Integer pageSize) {
+        // 查询已发布的文章
+        List<Article> articles = articleMapper.selectByCursor(lastId, pageSize, 1);
 
-        Page<Article> articlePage = articleMapper.selectPage(page, queryWrapper);
-        Page<ArticleListInfo> resultPage = new Page<>(articlePage.getCurrent(), articlePage.getSize(), articlePage.getTotal());
-
-        if (CollectionUtils.isEmpty(articlePage.getRecords())) {
-            return resultPage;
+        if (CollectionUtils.isEmpty(articles)) {
+            return new ArrayList<>();
         }
 
         // 获取作者信息
-        List<Long> authorIds = articlePage.getRecords().stream()
+        List<Long> authorIds = articles.stream()
                 .map(Article::getAuthorId)
                 .distinct()
                 .collect(Collectors.toList());
         Map<Long, UserInfo> userInfoMap = getUserInfoMap(authorIds);
 
         // 转换VO
-        List<ArticleListInfo> articleListInfos = articlePage.getRecords().stream()
+        return articles.stream()
                 .map(article -> {
                     ArticleListInfo info = new ArticleListInfo();
                     info.setId(article.getId());
@@ -85,9 +80,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                     return info;
                 })
                 .collect(Collectors.toList());
-
-        resultPage.setRecords(articleListInfos);
-        return resultPage;
     }
 
     @Override
@@ -101,16 +93,19 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         article.setViewCount(article.getViewCount() == null ? 1 : article.getViewCount() + 1);
         articleMapper.updateById(article);
 
-        // 获取作者信息
-        UserInfo userInfo = getUserInfo(article.getAuthorId());
+        // 并行查询作者信息和图片列表
+        CompletableFuture<UserInfo> userInfoFuture = CompletableFuture.supplyAsync(() -> getUserInfo(article.getAuthorId()));
+        CompletableFuture<List<String>> imageUrlsFuture = CompletableFuture.supplyAsync(() -> {
+            LambdaQueryWrapper<ArticleImage> imageQueryWrapper = new LambdaQueryWrapper<>();
+            imageQueryWrapper.eq(ArticleImage::getArticleId, articleId);
+            return articleImageMapper.selectList(imageQueryWrapper).stream()
+                    .map(ArticleImage::getImageUrl)
+                    .collect(Collectors.toList());
+        });
 
-        // 获取文章图片列表
-        LambdaQueryWrapper<ArticleImage> imageQueryWrapper = new LambdaQueryWrapper<>();
-        imageQueryWrapper.eq(ArticleImage::getArticleId, articleId);
-        List<ArticleImage> articleImages = articleImageMapper.selectList(imageQueryWrapper);
-        List<String> imageUrls = articleImages.stream()
-                .map(ArticleImage::getImageUrl)
-                .collect(Collectors.toList());
+        // 等待所有查询完成
+        UserInfo userInfo = userInfoFuture.join();
+        List<String> imageUrls = imageUrlsFuture.join();
 
         // 转换VO
         ArticleDetailInfo info = new ArticleDetailInfo();
@@ -257,31 +252,32 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             return Map.of();
         }
 
-        List<UserInfo> userInfos = new ArrayList<>();
-        for (Long userId : userIds) {
-            UserInfo userInfo = getUserInfo(userId);
-            if (userInfo != null) {
-                userInfos.add(userInfo);
+        try {
+            // 批量查询用户信息（一次RPC调用）
+            List<String> stringIds = userIds.stream().map(String::valueOf).collect(Collectors.toList());
+            Response<List<UserInfo>> response = userFacadeService.queryUserByIds(stringIds);
+
+            if (response != null && response.getSuccess() && response.getData() != null) {
+                return response.getData().stream()
+                        .collect(Collectors.toMap(
+                                info -> Long.parseLong(info.getUserId()),
+                                info -> info,
+                                (v1, v2) -> v1
+                        ));
             }
+        } catch (Exception e) {
+            log.error("批量获取用户信息失败, userIds: {}", userIds, e);
         }
 
-        return userInfos.stream()
-                .collect(Collectors.toMap(
-                        info -> Long.parseLong(info.getUserId()),
-                        info -> info,
-                        (v1, v2) -> v1
-                ));
+        return Map.of();
     }
 
-    /**
-     * 获取单个用户信息
-     */
     private UserInfo getUserInfo(Long userId) {
         try {
             UserQueryRequest request = new UserQueryRequest();
             request.setUserId(String.valueOf(userId));
             Response<UserInfo> response = userFacadeService.queryUserById(request);
-            if (response != null && response.isSuccess() && response.getData() != null) {
+            if (response != null && response.getSuccess() && response.getData() != null) {
                 return response.getData();
             }
         } catch (Exception e) {
