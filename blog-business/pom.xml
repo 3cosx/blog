@@ -17,6 +17,7 @@
         <module>blog-product</module>
         <module>blog-inventory</module>
         <module>blog-order</module>
+        <module>blog-article</module>
     </modules>
 
 
