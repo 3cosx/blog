@@ -1,0 +1,27 @@
+package cn.cosx.blog.article.domain.entity;
+
+import cn.cosx.blog.database.domain.entity.BaseEntity;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+@TableName("comment")
+public class Comment extends BaseEntity {
+
+    private static final long serialVersionUID = 1L;
+
+    @TableField("article_id")
+    private Long articleId;
+
+    @TableField("user_id")
+    private Long userId;
+
+    @TableField("content")
+    private String content;
+
+    @TableField("parent_id")
+    private Long parentId;
+}
