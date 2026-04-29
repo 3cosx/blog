@@ -14,7 +14,7 @@ public class ArticleLike extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @TableField("article_id")
-    private Long authorId;
+    private Long articleId;
 
     @TableField("user_id")
     private Long userId;
