@@ -1,19 +1,18 @@
-package cn.cosx.blog.knowledge.document.entity;
+package cn.cosx.blog.mentor.agent.document.entity;
 
-import cn.cosx.blog.knowledge.document.constant.SegmentStatus;
-import com.alibaba.fastjson2.JSON;
+import cn.cosx.blog.mentor.agent.document.enums.SegmentStatus;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-
-import java.util.Map;
+import lombok.EqualsAndHashCode;
 
 /**
- * 知识片段表实体类
+ * 文档分片实体类
+ * 对应数据库表 knowledge_segment
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("knowledge_segment")
 public class KnowledgeSegment extends BaseEntity {
 
@@ -63,10 +62,4 @@ public class KnowledgeSegment extends BaseEntity {
      */
     private Integer skipEmbedding;
 
-    @JsonIgnore
-    public Map<String, String> getMetadataMap() {
-        return metadata == null ? null : JSON.parseObject(metadata, Map.class);
-    }
 }
-
-

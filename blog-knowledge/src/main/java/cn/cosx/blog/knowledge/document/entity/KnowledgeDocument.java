@@ -1,22 +1,18 @@
-package cn.cosx.blog.knowledge.document.entity;
+package cn.cosx.blog.mentor.agent.document.entity;
 
-import cn.cosx.blog.knowledge.document.constant.DocumentStatus;
-import cn.cosx.blog.knowledge.document.constant.KnowledgeBaseType;
-import com.alibaba.fastjson2.JSON;
+import cn.cosx.blog.mentor.agent.document.enums.DocumentStatus;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import lombok.EqualsAndHashCode;
 
 /**
- * 知识文档表实体类
+ * 文档信息实体类
+ * 对应数据库表 knowledge_document
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("knowledge_document")
 public class KnowledgeDocument extends BaseEntity {
 
@@ -61,41 +57,10 @@ public class KnowledgeDocument extends BaseEntity {
      */
     private String description;
 
-    /**
-     * 知识库类型
-     */
-    private KnowledgeBaseType knowledgeBaseType;
 
     /**
      * 扩展字段，保存JSON字符串
      */
     private String extension;
 
-    @JsonIgnore
-    public Boolean isOverride() {
-        if (extension != null && !extension.isEmpty()) {
-            return (Boolean) JSON.parseObject(extension, Map.class).get("isOverride");
-        }
-        return false;
-    }
-
-    @JsonIgnore
-    public String getTableName() {
-        if (extension != null && !extension.isEmpty()) {
-            return (String) JSON.parseObject(extension, Map.class).get("tableName");
-        }
-        return null;
-    }
-
-    @JsonIgnore
-    public void setTableName(String tableName) {
-        Map<String, Serializable> extensionMap;
-        if (extension == null) {
-            extensionMap = new HashMap<String, Serializable>();
-        } else {
-            extensionMap = JSON.parseObject(extension, Map.class);
-        }
-        extensionMap.put("tableName", tableName);
-        this.extension = JSON.toJSONString(extensionMap);
-    }
 }

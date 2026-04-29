@@ -1,6 +1,7 @@
-package cn.cosx.blog.knowledge.document.constant;
+package cn.cosx.blog.mentor.agent.document.enums;
 
 public enum DocumentStatus {
+
     /**
      * 初始状态
      */

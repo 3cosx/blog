@@ -1,6 +1,7 @@
-package cn.cosx.blog.knowledge.document.constant;
+package cn.cosx.blog.mentor.agent.document.enums;
 
 public enum SegmentStatus {
+
     /**
      * 关系型数据库存储完成
      */

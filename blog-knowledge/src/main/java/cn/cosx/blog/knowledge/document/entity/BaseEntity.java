@@ -1,38 +1,40 @@
-package cn.cosx.blog.knowledge.document.entity;
+package cn.cosx.blog.mentor.agent.document.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+
+/**
+ * 实体基类
+ * 包含公共字段
+ */
 @Getter
 @Setter
-public class BaseEntity {
+public abstract class BaseEntity {
 
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
-    protected LocalDateTime createdAt;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime createTime;
 
     /**
-     * 修改时间
+     * 更新时间
      */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    protected LocalDateTime updatedAt;
+
+    private LocalDateTime updateTime;
 
     /**
      * 乐观锁版本号
      */
-    @Version
+    //@Version
     protected Integer lockVersion;
-
     /**
-     * 是否删除：0-未删除，1-已删除
+     * 删除标记（0-未删除 1-已删除）
      */
     @TableLogic
-    protected Integer deleted;
+    private Integer deleted;
 }
