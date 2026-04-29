@@ -1,0 +1,12 @@
+package cn.cosx.blog.user.infrastructure.mapper;
+
+import cn.cosx.blog.user.domain.entity.UserProfile;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
+
+/**
+ * 用户扩展信息表 Mapper 接口
+ */
+@Mapper
+public interface UserProfileMapper extends BaseMapper<UserProfile> {
+}
