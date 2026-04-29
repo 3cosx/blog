@@ -1,9 +1,12 @@
 package cn.cosx.blog.user.controller;
 
 import cn.cosx.blog.api.user.vo.UserInfo;
+import cn.cosx.blog.api.user.vo.UserProfileInfo;
 import cn.cosx.blog.base.result.Result;
 import cn.cosx.blog.user.converter.UserConverter;
 import cn.cosx.blog.user.domain.entity.User;
+import cn.cosx.blog.user.domain.entity.UserProfile;
+import cn.cosx.blog.user.domain.service.UserProfileService;
 import cn.cosx.blog.user.domain.service.UserService;
 import cn.cosx.blog.user.infrastructure.exception.UserErrorCodeEnum;
 import cn.cosx.blog.user.infrastructure.exception.UserException;
@@ -15,6 +18,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -24,6 +28,9 @@ public class UserController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private UserProfileService userProfileService;
 
 
     @PostMapping("/getUserInfo")
@@ -49,7 +56,7 @@ public class UserController {
         return Result.success(result);
     }
 
-    @PostMapping("/auth")
+@PostMapping("/auth")
     public Result<Boolean> auth(@Valid @RequestBody UserAuthParam param) {
         String userId = (String) StpUtil.getLoginId();
         User user = userService.findById(userId);
@@ -60,4 +67,16 @@ public class UserController {
         return Result.success(result);
     }
 
-}
+    @PostMapping("/getUserProfile")
+    public Result<UserProfileInfo> getUserProfile(@RequestParam Long userId) {
+        UserProfileInfo info = userProfileService.getUserProfileInfo(userId);
+        return Result.success(info);
+    }
+
+    @PostMapping("/updateUserProfile")
+    public Result<Boolean> updateUserProfile(@RequestBody UserProfile param) {
+        String userId = (String) StpUtil.getLoginId();
+        param.setUserId(Long.parseLong(userId));
+        Boolean result = userProfileService.update(param);
+        return Result.success(result);
+    }
