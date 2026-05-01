@@ -1,10 +1,12 @@
 package cn.cosx.blog.knowledge.rag.service.impl;
 
-import cn.cosx.blog.knowledge.document.entity.KnowledgeDocument;
-import cn.cosx.blog.knowledge.document.entity.KnowledgeSegment;
-import cn.cosx.blog.knowledge.document.enums.DocumentStatus;
-import cn.cosx.blog.knowledge.document.enums.SegmentStatus;
-import cn.cosx.blog.knowledge.document.file.MinioUtils;
+import cn.cosx.blog.knowledge.document.domain.entity.KnowledgeDocument;
+import cn.cosx.blog.knowledge.document.domain.entity.KnowledgeSegment;
+import cn.cosx.blog.knowledge.document.infra.enums.DocumentStatus;
+import cn.cosx.blog.knowledge.document.infra.enums.SegmentStatus;
+import cn.cosx.blog.knowledge.document.infra.enums.SplitType;
+import cn.cosx.blog.knowledge.document.infra.file.MinioUtils;
+import cn.cosx.blog.knowledge.document.infra.param.DocumentSplitParam;
 import cn.cosx.blog.knowledge.rag.event.DocumentEmbeddingEvent;
 import cn.cosx.blog.knowledge.rag.splitter.MarkdownHeaderParentTextSplitter;
 import cn.cosx.blog.knowledge.document.service.IKnowledgeDocumentService;
@@ -24,15 +26,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 文档切分Service实现类
- */
 @Slf4j
 @Service
 public class DocumentChunkServiceImpl implements IDocumentChunkService {
 
-    private static final int CHUNK_SIZE = 500;
-    private static final int OVERLAP = 50;
+    private static final int DEFAULT_CHUNK_SIZE = 500;
+    private static final int DEFAULT_OVERLAP = 50;
 
     @Autowired
     private IKnowledgeDocumentService knowledgeDocumentService;
@@ -48,45 +47,45 @@ public class DocumentChunkServiceImpl implements IDocumentChunkService {
 
     @Override
     @Transactional
-    public void chunkDocument(Long documentId) {
-        log.info("[DocumentChunk] 开始处理文档切分，docId: {}", documentId);
+    public void chunkDocument(DocumentSplitParam param) {
+        log.info("[DocumentChunk] 开始处理文档切分，param: {}", param);
 
-        KnowledgeDocument document = knowledgeDocumentService.getByDocId(documentId);
+        KnowledgeDocument document = knowledgeDocumentService.getByDocId(param.getDocId());
         if (document == null) {
-            throw new IllegalArgumentException("文档不存在: " + documentId);
+            throw new IllegalArgumentException("文档不存在: " + param.getDocId());
         }
 
-        if(document.getStatus() == DocumentStatus.CHUNKED){
-            return ;
+        if (document.getStatus() == DocumentStatus.CHUNKED) {
+            log.info("[DocumentChunk] 文档已切分，跳过，docId: {}", param.getDocId());
+            return;
         }
 
-        if(document.getStatus() != DocumentStatus.CONVERTED){
-            throw new IllegalArgumentException("文档状态非CONVERTED，无法切分: " + documentId);
+        if (document.getStatus() != DocumentStatus.CONVERTED) {
+            throw new IllegalArgumentException("文档状态非CONVERTED，无法切分: " + param.getDocId());
         }
-        chunkDocument(document);
 
-        //抛出一个事件做embedding
-        eventPublisher.publishEvent(new DocumentEmbeddingEvent(this, documentId));
+        doChunk(document, param);
+
+        eventPublisher.publishEvent(new DocumentEmbeddingEvent(this, param.getDocId()));
     }
 
-    @Override
-    @Transactional
-    public void chunkDocument(KnowledgeDocument document) {
+    private void doChunk(KnowledgeDocument document, DocumentSplitParam param) {
         Long documentId = document.getDocId();
         log.info("[DocumentChunk] 开始切分文档，docId: {}, docTitle: {}", documentId, document.getDocTitle());
 
         try {
-            // 1. 从文档信息中获取convertedDocUrl，下载文件内容
             String markdownContent = downloadMarkdownContent(document);
 
-            // 2. 使用MarkdownHeaderParentTextSplitter对文件内容进行切分
-            MarkdownHeaderParentTextSplitter splitter = new MarkdownHeaderParentTextSplitter(CHUNK_SIZE, OVERLAP);
+            int chunkSize = param.getChunkSize() != null ? param.getChunkSize() : DEFAULT_CHUNK_SIZE;
+            int overlap = param.getOverlapSize() != null ? param.getOverlapSize() : DEFAULT_OVERLAP;
+
+            MarkdownHeaderParentTextSplitter splitter = new MarkdownHeaderParentTextSplitter(chunkSize, overlap);
+
             Map<String, Object> baseMetadata = new HashMap<>();
             baseMetadata.put("documentId", documentId.toString());
             List<TextSegment> segments = splitter.splitText(markdownContent, baseMetadata);
             log.info("[DocumentChunk] 文档切分完成，docId: {}, 切分数量: {}", documentId, segments.size());
 
-            // 3. 保存切分片段到KnowledgeSegment
             List<KnowledgeSegment> knowledgeSegments = new ArrayList<>();
             for (int i = 0; i < segments.size(); i++) {
                 TextSegment segment = segments.get(i);
@@ -100,9 +99,7 @@ public class DocumentChunkServiceImpl implements IDocumentChunkService {
                 Integer skipEmbedding = segment.metadata().getInteger("skipEmbedding");
                 knowledgeSegment.setSkipEmbedding(skipEmbedding != null ? skipEmbedding : 0);
 
-                Map<String, Object> metadata = segment.metadata().toMap();
-
-                knowledgeSegment.setMetadata(convertMetadataToJson(metadata));
+                knowledgeSegment.setMetadata(convertMetadataToJson(segment.metadata().toMap()));
 
                 knowledgeSegments.add(knowledgeSegment);
             }
@@ -112,7 +109,6 @@ public class DocumentChunkServiceImpl implements IDocumentChunkService {
                 log.info("[DocumentChunk] 切分片段保存成功，docId: {}, 保存数量: {}", documentId, knowledgeSegments.size());
             }
 
-            // 4. 更新文档状态为CHUNKED
             knowledgeDocumentService.updateStatus(documentId, DocumentStatus.CHUNKED);
             log.info("[DocumentChunk] 文档状态已更新为CHUNKED，docId: {}", documentId);
 

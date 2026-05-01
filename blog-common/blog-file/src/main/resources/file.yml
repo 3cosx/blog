@@ -1,0 +1,6 @@
+minio:
+  url: http://112.126.84.219:9001/
+  accessKey: admin
+  secretKey: admin123456
+  bucketName: rag-test
+  endpoint: http://112.126.84.219:9000

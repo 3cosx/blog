@@ -1,8 +1,8 @@
 package cn.cosx.blog.knowledge.document.service.impl;
 
-import cn.cosx.blog.knowledge.document.entity.KnowledgeDocument;
-import cn.cosx.blog.knowledge.document.enums.DocumentStatus;
-import cn.cosx.blog.knowledge.document.mapper.KnowledgeDocumentMapper;
+import cn.cosx.blog.knowledge.document.domain.entity.KnowledgeDocument;
+import cn.cosx.blog.knowledge.document.infra.enums.DocumentStatus;
+import cn.cosx.blog.knowledge.document.domain.mapper.KnowledgeDocumentMapper;
 import cn.cosx.blog.knowledge.document.service.IKnowledgeDocumentService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -70,5 +70,11 @@ public class KnowledgeDocumentServiceImpl extends ServiceImpl<KnowledgeDocumentM
         LambdaQueryWrapper<KnowledgeDocument> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(KnowledgeDocument::getStatus, status);
         return this.list(wrapper);
+    }
+
+    @Override
+    @Transactional
+    public boolean updateById(KnowledgeDocument document) {
+        return super.updateById(document);
     }
 }

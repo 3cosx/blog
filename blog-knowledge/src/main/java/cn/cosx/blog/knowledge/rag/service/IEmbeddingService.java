@@ -1,6 +1,6 @@
 package cn.cosx.blog.knowledge.rag.service;
 
-import cn.cosx.blog.knowledge.document.entity.KnowledgeDocument;
+import cn.cosx.blog.knowledge.document.domain.entity.KnowledgeDocument;
 
 /**
  * 向量化Service接口

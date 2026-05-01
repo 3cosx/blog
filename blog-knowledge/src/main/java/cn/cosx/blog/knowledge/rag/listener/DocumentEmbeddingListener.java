@@ -1,8 +1,5 @@
 package cn.cosx.blog.knowledge.rag.listener;
 
-import cn.cosx.blog.knowledge.document.entity.KnowledgeDocument;
-import cn.cosx.blog.knowledge.document.enums.DocumentStatus;
-import cn.cosx.blog.knowledge.document.service.IKnowledgeDocumentService;
 import cn.cosx.blog.knowledge.rag.service.IEmbeddingService;
 import cn.cosx.blog.knowledge.rag.event.DocumentEmbeddingEvent;
 import lombok.extern.slf4j.Slf4j;

@@ -1,9 +1,9 @@
 package cn.cosx.blog.knowledge.document.service.impl;
 
 import cn.cosx.blog.knowledge.common.Page;
-import cn.cosx.blog.knowledge.document.entity.KnowledgeSegment;
-import cn.cosx.blog.knowledge.document.enums.SegmentStatus;
-import cn.cosx.blog.knowledge.document.mapper.KnowledgeSegmentMapper;
+import cn.cosx.blog.knowledge.document.domain.entity.KnowledgeSegment;
+import cn.cosx.blog.knowledge.document.infra.enums.SegmentStatus;
+import cn.cosx.blog.knowledge.document.domain.mapper.KnowledgeSegmentMapper;
 import cn.cosx.blog.knowledge.document.service.IKnowledgeSegmentService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;

@@ -15,7 +15,7 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
-        <application.name>nfturbo-notice</application.name>
+        <application.name>blog-notice</application.name>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -64,6 +64,11 @@
         <dependency>
             <groupId>cn.cosx</groupId>
             <artifactId>blog-sms</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.cosx</groupId>
+            <artifactId>blog-cache</artifactId>
         </dependency>
 
 <!--        <dependency>-->

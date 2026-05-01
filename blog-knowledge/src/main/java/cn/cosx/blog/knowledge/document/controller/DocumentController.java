@@ -1,6 +1,7 @@
 package cn.cosx.blog.knowledge.document.controller;
 
 import cn.cosx.blog.knowledge.common.BaseResult;
+import cn.cosx.blog.knowledge.document.infra.param.DocumentSplitParam;
 import cn.cosx.blog.knowledge.document.processor.DocumentServiceProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,9 @@ public class DocumentController {
     public BaseResult<Long> uploadDocument(
             @RequestParam("file") MultipartFile file,
             @RequestParam("docTitle") String docTitle,
+            @RequestParam(value = "description") String description,
             @RequestParam("uploadUser") String uploadUser,
-            @RequestParam(value = "description", required = false) String description,
+            @RequestParam("useType") String useType,
             @RequestParam(value = "accessibleBy", required = false) String accessibleBy) {
 
         log.info("[DocumentController] 接收到文档上传请求，docTitle: {}, uploadUser: {}, fileName: {}",
@@ -44,7 +46,7 @@ public class DocumentController {
 
         try {
             Long docId = documentService.uploadAndProcessDocument(
-                    file, docTitle, uploadUser, description, accessibleBy);
+                    file, docTitle, uploadUser, description, accessibleBy,useType);
 
             Map<String, Object> data = new HashMap<>();
             data.put("docId", docId);
@@ -56,4 +58,30 @@ public class DocumentController {
             return BaseResult.fail(400, e.getMessage());
         }
     }
+
+    /**
+     * 文档分割
+     *
+     * @param documentId 文档ID（路径参数）
+     * @param splitParam 分割参数（请求体，docId会被路径参数覆盖）
+     * @return 分割结果
+     */
+    @PostMapping("/split/{documentId}")
+    public BaseResult<Boolean> splitDocument(
+            @PathVariable("documentId") Long documentId,
+            @RequestBody DocumentSplitParam splitParam) {
+
+        splitParam.setDocId(documentId);
+        log.info("[DocumentController] 接收到文档分割请求，param: {}", splitParam);
+
+        try {
+            return BaseResult.newSuccess(documentService.splitDocument(splitParam));
+        } catch (Exception e) {
+            log.error("[DocumentController] 文档分割失败，documentId: {}", documentId, e);
+            return BaseResult.fail(400, e.getMessage());
+        }
+    }
+
+
+
 }

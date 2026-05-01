@@ -17,7 +17,7 @@ public class StpInterfaceImpl implements StpInterface {
     public List<String> getPermissionList(Object loginId, String loginType) {
         UserInfo userInfo = (UserInfo)StpUtil.getSessionByLoginId(loginId).get((String) loginId);
         if(userInfo.getState().equals(UserStateEnum.INIT.getCode()) || userInfo.getState().equals(UserStateEnum.AUTH.getCode())) {
-            List.of(UserPermissionEnum.NORMAL.name());
+            return List.of(UserPermissionEnum.NORMAL.name());
         }
 
         if(userInfo.getState().equals(UserStateEnum.FROZEN.getCode())){

@@ -18,6 +18,7 @@ import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.druid.util.StringUtils;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
@@ -26,11 +27,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.TimeUnit;
+
 import static cn.cosx.blog.auth.constant.LoginParamConstants.DEFAULT_EXPIRE_TIME;
 import static cn.cosx.blog.auth.exception.AuthErrorCode.VERIFICATION_CODE_WRONG;
 
 @RestController
 @RequestMapping("/auth")
+@Slf4j
 public class AuthController {
 
     @Resource
@@ -43,13 +47,20 @@ public class AuthController {
     private NoticeFacadeService noticeFacadeService;
 
     @PostMapping("/sendAndGetCaptcha")
-    public Result<String> sendAndGetCaptcha(@Validated @RequestBody NoticeParam param) {
+    public Result<Boolean> sendAndGetCaptcha(@Validated @RequestBody NoticeParam param) {
+        String captcha = (String) redisTemplate.opsForValue().get(CaptchaConstants.CAPTCHA_KEY + param.getEmail());
 
+        log.info("captcha: {}", captcha);
+        if(!StringUtils.isEmpty(captcha)) {
+            return Result.success(true);
+        }
         Response<String> response = RemoteCallWrapper.call(req -> noticeFacadeService.sendAndGetCaptcha(param.getEmail()), param, "response");
+        log.info("response: {}", response);
+
         if (!response.getSuccess()) {
             return Result.error(response.getResponseMessage());
         }
-        return Result.success(response.getData());
+        return Result.success(true);
     }
 
     @PostMapping("/login")
@@ -81,8 +92,8 @@ public class AuthController {
         //登录
         StpUtil.login(userInfo.getUserId(),
                 new SaLoginModel().setIsLastingCookie(param.getRememberMe()).setTimeout(DEFAULT_EXPIRE_TIME));
-        //保存信息到session
-        StpUtil.getSession().set(userInfo.getUserId(),userInfo);
+        //保存信息到用户级Session（与StpInterfaceImpl读取的Session一致）
+        StpUtil.getSessionByLoginId(userInfo.getUserId()).set(userInfo.getUserId(), userInfo);
         LoginVO loginVO = new LoginVO(userInfo);
         return Result.success(loginVO);
 

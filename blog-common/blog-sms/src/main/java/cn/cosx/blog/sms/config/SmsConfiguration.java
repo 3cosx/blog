@@ -3,10 +3,10 @@ package cn.cosx.blog.sms.config;
 import cn.cosx.blog.sms.service.SmsService;
 import cn.cosx.blog.sms.service.impl.SmsServiceImpl;
 import jakarta.annotation.Resource;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@AutoConfiguration
+@Configuration
 public class SmsConfiguration {
 
     @Bean

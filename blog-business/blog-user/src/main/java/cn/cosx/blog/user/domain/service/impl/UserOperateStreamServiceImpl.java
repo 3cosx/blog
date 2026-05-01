@@ -28,7 +28,7 @@ public class UserOperateStreamServiceImpl extends ServiceImpl<UserOperateStreamM
         stream.setParam(JSON.toJSONString(user));
         boolean result = save(stream);
         if (result) {
-            return stream.getId();
+            return String.valueOf(stream.getId());
         }
         return null;
     }

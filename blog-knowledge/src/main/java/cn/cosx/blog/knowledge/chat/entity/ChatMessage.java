@@ -1,8 +1,7 @@
 package cn.cosx.blog.knowledge.chat.entity;
 
-import cn.cosx.blog.knowledge.chat.enums.MessageType;
 import cn.cosx.blog.knowledge.chat.enums.RetrievalSource;
-import cn.cosx.blog.knowledge.document.entity.BaseEntity;
+import cn.cosx.blog.knowledge.document.domain.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;

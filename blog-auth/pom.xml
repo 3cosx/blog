@@ -77,6 +77,12 @@
             <artifactId>blog-rpc</artifactId>
         </dependency>
 
+        <!-- blog-file - MinIO 文件存储 -->
+        <dependency>
+            <groupId>cn.cosx</groupId>
+            <artifactId>blog-file</artifactId>
+        </dependency>
+
         <!-- blog-config - Nacos 服务注册与发现 -->
         <dependency>
             <groupId>cn.cosx</groupId>

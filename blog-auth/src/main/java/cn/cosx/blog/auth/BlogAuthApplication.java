@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * @author hollis
  */
-@SpringBootApplication(scanBasePackages = {"cn.cosx.blog.auth"})
+@SpringBootApplication(scanBasePackages = "cn.cosx.blog")
 @EnableDubbo
 public class BlogAuthApplication {
 

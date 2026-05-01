@@ -1,7 +1,7 @@
 package cn.cosx.blog.knowledge.document.service;
 
-import cn.cosx.blog.knowledge.document.entity.KnowledgeDocument;
-import cn.cosx.blog.knowledge.document.enums.DocumentStatus;
+import cn.cosx.blog.knowledge.document.domain.entity.KnowledgeDocument;
+import cn.cosx.blog.knowledge.document.infra.enums.DocumentStatus;
 
 import java.util.List;
 
@@ -40,4 +40,9 @@ public interface IKnowledgeDocumentService {
      * 根据状态查询文档列表
      */
     List<KnowledgeDocument> listByStatus(DocumentStatus status);
+
+    /**
+     * 根据ID更新文档
+     */
+    boolean updateById(KnowledgeDocument document);
 }

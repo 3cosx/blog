@@ -14,12 +14,12 @@ spring:
             allowedMethods: '*'
             allowedOrigins: '*'
       routes:
-        - id: nfturbo-auth
-          uri: lb://nfturbo-auth
+        - id: blog-auth
+          uri: lb://blog-auth
           predicates:
             - Path=/auth/**,/token/**
-        - id: nfturbo-business
-          uri: lb://nfturbo-business
+        - id: blog-business
+          uri: lb://blog-business
           predicates:
             - Path=/user/**
 server:

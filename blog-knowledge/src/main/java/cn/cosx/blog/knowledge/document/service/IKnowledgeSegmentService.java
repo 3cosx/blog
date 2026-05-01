@@ -1,8 +1,8 @@
 package cn.cosx.blog.knowledge.document.service;
 
 import cn.cosx.blog.knowledge.common.Page;
-import cn.cosx.blog.knowledge.document.entity.KnowledgeSegment;
-import cn.cosx.blog.knowledge.document.enums.SegmentStatus;
+import cn.cosx.blog.knowledge.document.domain.entity.KnowledgeSegment;
+import cn.cosx.blog.knowledge.document.infra.enums.SegmentStatus;
 
 import java.io.Serializable;
 import java.util.List;

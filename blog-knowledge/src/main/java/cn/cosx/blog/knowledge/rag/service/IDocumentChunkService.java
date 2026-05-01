@@ -1,6 +1,7 @@
 package cn.cosx.blog.knowledge.rag.service;
 
-import cn.cosx.blog.knowledge.document.entity.KnowledgeDocument;
+import cn.cosx.blog.knowledge.document.domain.entity.KnowledgeDocument;
+import cn.cosx.blog.knowledge.document.infra.param.DocumentSplitParam;
 
 /**
  * 文档切分Service接口
@@ -12,12 +13,6 @@ public interface IDocumentChunkService {
      *
      * @param documentId 文档ID
      */
-    void chunkDocument(Long documentId);
+    void chunkDocument(DocumentSplitParam documentSplitParam);
 
-    /**
-     * 切分文档
-     *
-     * @param document 文档实体
-     */
-    void chunkDocument(KnowledgeDocument document);
 }

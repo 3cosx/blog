@@ -45,6 +45,11 @@
             <groupId>cn.cosx</groupId>
             <artifactId>blog-rpc</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>cn.cosx</groupId>
+            <artifactId>blog-notice</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

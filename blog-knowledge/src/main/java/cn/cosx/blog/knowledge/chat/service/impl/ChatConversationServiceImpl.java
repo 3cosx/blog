@@ -3,7 +3,7 @@ package cn.cosx.blog.knowledge.chat.service.impl;
 import cn.cosx.blog.knowledge.chat.entity.ChatConversation;
 import cn.cosx.blog.knowledge.chat.enums.ConversationStatus;
 import cn.cosx.blog.knowledge.chat.mapper.ChatConversationMapper;
-import cn.cosx.blog.knowledge.chat.service.IChatConversationService;
+import cn.cosx.blog.knowledge.chat.service.ChatConversationService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,7 +16,7 @@ import java.util.List;
  * 会话Service实现类
  */
 @Service
-public class ChatConversationServiceImpl extends ServiceImpl<ChatConversationMapper, ChatConversation> implements IChatConversationService {
+public class ChatConversationServiceImpl extends ServiceImpl<ChatConversationMapper, ChatConversation> implements ChatConversationService {
 
     @Override
     public String saveConversation(String title) {

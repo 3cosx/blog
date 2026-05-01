@@ -1,7 +1,7 @@
 package cn.cosx.blog.knowledge.chat.controller;
 
 import cn.cosx.blog.knowledge.ai.service.TitleSummaryService;
-import cn.cosx.blog.knowledge.chat.service.IChatConversationService;
+import cn.cosx.blog.knowledge.chat.service.ChatConversationService;
 import cn.cosx.blog.knowledge.chat.service.IChatMessageService;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.service.AiServices;
@@ -25,7 +25,7 @@ public class ChatController {
     @Value("${langchain4j.open-ai.chat-model.base-url}")
     private String chatModelBaseUrl;
     @Autowired
-    private IChatConversationService chatConversationService;
+    private ChatConversationService chatConversationService;
 
     @Autowired
     private IChatMessageService chatMessageService;

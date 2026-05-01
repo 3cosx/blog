@@ -3,6 +3,7 @@ package cn.cosx.blog.user.controller;
 import cn.cosx.blog.api.user.vo.UserInfo;
 import cn.cosx.blog.api.user.vo.UserProfileInfo;
 import cn.cosx.blog.base.result.Result;
+import cn.cosx.blog.file.service.OssTemplate;
 import cn.cosx.blog.user.converter.UserConverter;
 import cn.cosx.blog.user.domain.entity.User;
 import cn.cosx.blog.user.domain.entity.UserProfile;
@@ -15,11 +16,8 @@ import cn.cosx.blog.user.param.UserModifyParam;
 import cn.dev33.satoken.stp.StpUtil;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -31,6 +29,9 @@ public class UserController {
 
     @Resource
     private UserProfileService userProfileService;
+
+    @Resource
+    private OssTemplate ossTemplate;
 
 
     @PostMapping("/getUserInfo")
@@ -80,4 +81,14 @@ public class UserController {
         Boolean result = userProfileService.update(param);
         return Result.success(result);
     }
+
+    /**
+     * 上传头像（需登录）
+     */
+    @PostMapping("/avatar/upload")
+    public Result<String> uploadAvatar(@RequestParam("file") MultipartFile file) {
+        StpUtil.checkLogin();
+        return Result.success(ossTemplate.uploadImage(file));
+    }
+
 }
