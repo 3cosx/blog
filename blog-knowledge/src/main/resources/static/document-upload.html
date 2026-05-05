@@ -53,6 +53,7 @@
             overflow-x: hidden;
         }
 
+        /* Subtle paper texture overlay */
         body::before {
             content: '';
             position: fixed;
@@ -66,6 +67,7 @@
             z-index: 0;
         }
 
+        /* Decorative corner elements */
         .corner-decor {
             position: fixed;
             width: 200px;
@@ -86,6 +88,7 @@
             background: radial-gradient(ellipse at bottom right, var(--accent-amber-soft) 0%, transparent 70%);
         }
 
+        /* Main card */
         .upload-card {
             position: relative;
             z-index: 10;
@@ -108,6 +111,7 @@
             }
         }
 
+        /* Header section */
         .header {
             text-align: center;
             margin-bottom: 44px;
@@ -162,12 +166,14 @@
             letter-spacing: 1px;
         }
 
+        /* Divider */
         .divider {
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--border-medium), transparent);
             margin: 28px 0;
         }
 
+        /* Form sections */
         .form-section {
             margin-bottom: 28px;
             animation: formSlide 0.6s ease-out backwards;
@@ -203,6 +209,7 @@
             margin-left: 2px;
         }
 
+        /* Input fields */
         .form-input {
             width: 100%;
             padding: 14px 18px;
@@ -231,6 +238,7 @@
             box-shadow: 0 0 0 4px var(--accent-amber-soft);
         }
 
+        /* Drop zone */
         .drop-zone {
             position: relative;
             border: 2px dashed var(--border-medium);
@@ -326,6 +334,7 @@
             color: var(--text-muted);
         }
 
+        /* File preview */
         .file-preview {
             display: none;
             margin-top: 16px;
@@ -412,6 +421,7 @@
             transform: rotate(90deg);
         }
 
+        /* Submit button */
         .submit-btn {
             width: 100%;
             padding: 18px 32px;
@@ -478,6 +488,7 @@
             left: -100%;
         }
 
+        /* Loading state */
         .loading-state {
             display: none;
             text-align: center;
@@ -511,6 +522,7 @@
             letter-spacing: 1px;
         }
 
+        /* Result message */
         .result-message {
             display: none;
             margin-top: 24px;
@@ -594,6 +606,7 @@
             word-break: break-all;
         }
 
+        /* Footer */
         .footer-link {
             display: block;
             text-align: center;
@@ -627,6 +640,7 @@
             margin-right: 6px;
         }
 
+        /* Responsive */
         @media (max-width: 640px) {
             body {
                 padding: 24px 16px;
@@ -700,13 +714,78 @@
             </div>
 
             <div class="form-section">
-                <label class="form-label" for="docTitle">文档标题</label>
-                <input type="text" class="form-input" id="docTitle" name="docTitle" placeholder="给文档起个标题">
+                <label class="form-label" for="docTitle">文档标题 <span>*</span></label>
+                <input type="text" class="form-input" id="docTitle" name="docTitle" placeholder="给文档起个标题" required>
             </div>
 
             <div class="form-section">
                 <label class="form-label" for="uploadUser">上传用户 <span>*</span></label>
                 <input type="text" class="form-input" id="uploadUser" name="uploadUser" placeholder="你的用户名" required>
+            </div>
+
+            <div class="form-section">
+                <label class="form-label" for="useType">用途类型 <span>*</span></label>
+                <select class="form-input" id="useType" name="useType" required>
+                    <option value="">请选择用途类型</option>
+                    <option value="DOCUMENT_SEARCH">文档检索 — 检索文档内容</option>
+                    <option value="DATA_QUERY">数据查询 — 通过 SQL 查询结构化数据</option>
+                </select>
+            </div>
+
+            <div class="form-section" id="tableNameSection" style="display:none;">
+                <label class="form-label" for="tableName">表名 <span>*</span></label>
+                <input type="text" class="form-input" id="tableName" name="tableName" placeholder="输入 Excel 对应的数据库表名">
+                <p style="font-size:11px;color:var(--text-muted);margin-top:6px;">数据查询模式下，Excel 数据将被导入到此表中</p>
+            </div>
+
+            <div class="form-section">
+                <label class="form-label" for="description">文档描述</label>
+                <input type="text" class="form-input" id="description" name="description" placeholder="简要描述文档内容">
+            </div>
+
+            <div class="form-section">
+                <label class="form-label" for="accessibleBy">可见范围</label>
+                <input type="text" class="form-input" id="accessibleBy" name="accessibleBy" placeholder="留空表示所有人可见">
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Split config section -->
+            <div class="form-section">
+                <label class="form-label" style="margin-bottom:14px;">📐 分割配置 <span style="font-weight:400;font-size:11px;color:var(--text-muted);margin-left:8px;">（可选，使用默认值即可）</span></label>
+
+                <div style="margin-bottom:14px;">
+                    <label class="form-label" for="splitType">分割方式</label>
+                    <select class="form-input" id="splitType" name="splitType">
+                        <option value="markdown_header">按 Markdown 标题层级分割</option>
+                        <option value="fixed_size">按固定大小分割</option>
+                        <option value="regex">按正则表达式分割</option>
+                        <option value="separator">按分隔符分割</option>
+                    </select>
+                </div>
+
+                <div id="splitHeaderLevel" style="margin-bottom:14px;">
+                    <label class="form-label" for="headerLevel">标题层级（headerLevel）</label>
+                    <input type="number" class="form-input" id="headerLevel" name="headerLevel" value="2" min="1" max="6" placeholder="1-6">
+                    <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">按此层级标题切分，默认 2</p>
+                </div>
+
+                <div id="splitFixedSize" style="display:none;margin-bottom:14px;">
+                    <label class="form-label" for="chunkSize">块大小（chunkSize）</label>
+                    <input type="number" class="form-input" id="chunkSize" name="chunkSize" value="500" min="100" max="8000">
+                    <label class="form-label" for="overlapSize" style="margin-top:10px;">重叠大小（overlapSize）</label>
+                    <input type="number" class="form-input" id="overlapSize" name="overlapSize" value="50" min="0" max="1000">
+                </div>
+
+                <div id="splitRegex" style="display:none;margin-bottom:14px;">
+                    <label class="form-label" for="regex">正则表达式</label>
+                    <input type="text" class="form-input" id="regex" name="regex" placeholder="例如：\n{2,}">
+                </div>
+
+                <div id="splitSeparator" style="display:none;margin-bottom:14px;">
+                    <label class="form-label" for="separator">分隔符</label>
+                    <input type="text" class="form-input" id="separator" name="separator" placeholder="例如：\n\n">
+                </div>
             </div>
 
             <button type="submit" class="submit-btn" id="submitBtn">
@@ -715,7 +794,7 @@
 
             <div class="loading-state" id="loadingState">
                 <div class="spinner"></div>
-                <p>正在上传，请稍候...</p>
+                <p>正在上传并分割，请稍候...</p>
             </div>
 
             <div class="result-message" id="resultMessage">
@@ -760,9 +839,40 @@
         const resultContent = document.getElementById('resultContent');
         const resultIconSuccess = document.getElementById('resultIconSuccess');
         const resultIconError = document.getElementById('resultIconError');
+        const useType = document.getElementById('useType');
+        const tableNameSection = document.getElementById('tableNameSection');
+        const tableName = document.getElementById('tableName');
+        const splitType = document.getElementById('splitType');
+        const splitHeaderLevel = document.getElementById('splitHeaderLevel');
+        const splitFixedSize = document.getElementById('splitFixedSize');
+        const splitRegex = document.getElementById('splitRegex');
+        const splitSeparator = document.getElementById('splitSeparator');
 
         const API_BASE = '/knowledge';
 
+        // Show/hide tableName input based on useType
+        useType.addEventListener('change', function() {
+            if (this.value === 'DATA_QUERY') {
+                tableNameSection.style.display = 'block';
+                tableName.required = true;
+            } else {
+                tableNameSection.style.display = 'none';
+                tableName.required = false;
+                tableName.value = '';
+            }
+        });
+
+        // Show/hide split config fields based on splitType
+        function updateSplitFields() {
+            const val = splitType.value;
+            splitHeaderLevel.style.display = val === 'markdown_header' ? 'block' : 'none';
+            splitFixedSize.style.display = val === 'fixed_size' ? 'block' : 'none';
+            splitRegex.style.display = val === 'regex' ? 'block' : 'none';
+            splitSeparator.style.display = val === 'separator' ? 'block' : 'none';
+        }
+        splitType.addEventListener('change', updateSplitFields);
+
+        // Drag and drop handlers
         ['dragenter', 'dragover'].forEach(eventName => {
             dropZone.addEventListener(eventName, (e) => {
                 e.preventDefault();
@@ -784,6 +894,7 @@
             }
         });
 
+        // File input change
         fileInput.addEventListener('change', function() {
             if (this.files[0]) {
                 showFileInfo(this.files[0]);
@@ -808,6 +919,7 @@
             filePreview.classList.remove('show');
         });
 
+        // Form submit
         uploadForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -817,11 +929,27 @@
                 return;
             }
 
-            const docTitle = document.getElementById('docTitle').value || file.name;
+            const docTitle = document.getElementById('docTitle').value;
             const uploadUser = document.getElementById('uploadUser').value;
+            const selectedUseType = document.getElementById('useType').value;
+            const description = document.getElementById('description').value;
+            const accessibleBy = document.getElementById('accessibleBy').value;
+            const tableNameVal = document.getElementById('tableName').value;
 
+            if (!docTitle) {
+                showResult('error', '请填写文档标题');
+                return;
+            }
             if (!uploadUser) {
                 showResult('error', '请填写上传用户');
+                return;
+            }
+            if (!selectedUseType) {
+                showResult('error', '请选择用途类型');
+                return;
+            }
+            if (selectedUseType === 'DATA_QUERY' && !tableNameVal) {
+                showResult('error', '数据查询模式下请填写表名');
                 return;
             }
 
@@ -829,6 +957,12 @@
             formData.append('file', file);
             formData.append('docTitle', docTitle);
             formData.append('uploadUser', uploadUser);
+            formData.append('useType', selectedUseType);
+            formData.append('description', description);
+            formData.append('accessibleBy', accessibleBy);
+            if (tableNameVal) {
+                formData.append('tableName', tableNameVal);
+            }
 
             submitBtn.disabled = true;
             loadingState.style.display = 'block';
@@ -843,13 +977,44 @@
                 const result = await response.json();
 
                 if (response.ok && result.code === 200) {
-                    const data = result.data || {};
-                    let message = `文档ID: ${data.docId || 'N/A'}\n`;
-                    message += `标题: ${data.docTitle || docTitle}\n`;
-                    message += `URL: ${data.docUrl || 'N/A'}`;
+                    const docId = result.data || null;
+                    let message = `文档ID: ${docId || 'N/A'}\n`;
+                    message += `标题: ${docTitle}\n`;
+                    message += `用途: ${selectedUseType === 'DATA_QUERY' ? '数据查询' : '文档检索'}`;
+
+                    // Call split API after upload
+                    if (docId) {
+                        try {
+                            const splitParam = {
+                                docId: docId,
+                                splitType: document.getElementById('splitType').value,
+                                chunkSize: parseInt(document.getElementById('chunkSize').value) || 500,
+                                overlapSize: parseInt(document.getElementById('overlapSize').value) || 50,
+                                headerLevel: parseInt(document.getElementById('headerLevel').value) || 2,
+                                regex: document.getElementById('regex').value || null,
+                                separator: document.getElementById('separator').value || null
+                            };
+                            const splitResp = await fetch(`${API_BASE}/documents/split/${docId}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(splitParam)
+                            });
+                            const splitResult = await splitResp.json();
+                            if (splitResp.ok && splitResult.code === 200) {
+                                message += `\n分割结果: 成功`;
+                            } else {
+                                message += `\n分割结果: ${splitResult.message || '失败'}`;
+                            }
+                        } catch (splitErr) {
+                            message += `\n分割结果: ${splitErr.message}`;
+                        }
+                    }
+
                     showResult('success', '上传成功', message);
                     uploadForm.reset();
                     filePreview.classList.remove('show');
+                    tableNameSection.style.display = 'none';
+                    tableName.required = false;
                 } else {
                     showResult('error', '上传失败', result.message || '服务器返回错误');
                 }

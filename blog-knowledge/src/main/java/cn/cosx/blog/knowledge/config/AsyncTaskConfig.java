@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -15,7 +17,29 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 @EnableAsync
 @Slf4j
-public class AsyncTaskConfig {
+public class AsyncTaskConfig implements WebMvcConfigurer {
+
+    /**
+     * MVC 异步请求线程池（SSE 流式响应用）
+     */
+    @Override
+    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+        configurer.setTaskExecutor(mvcAsyncExecutor());
+    }
+
+    @Bean(name = "mvcAsyncExecutor")
+    public ThreadPoolTaskExecutor mvcAsyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(8);
+        executor.setMaxPoolSize(16);
+        executor.setQueueCapacity(50);
+        executor.setKeepAliveSeconds(120);
+        executor.setThreadNamePrefix("mvc-async-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.initialize();
+        return executor;
+    }
 
     @Bean(name = "documentTaskExecutor")
     public Executor documentTaskExecutor() {

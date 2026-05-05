@@ -1,6 +1,6 @@
 package cn.cosx.blog.knowledge.document.job;
 
-import cn.cosx.blog.knowledge.document.service.IKnowledgeSegmentService;
+import cn.cosx.blog.knowledge.document.service.KnowledgeSegmentService;
 import cn.cosx.blog.knowledge.rag.service.IEmbeddingService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import java.util.List;
 public class EmbeddingCompensationJob {
 
     @Autowired
-    private IKnowledgeSegmentService knowledgeSegmentService;
+    private KnowledgeSegmentService knowledgeSegmentService;
 
     @Autowired
     private IEmbeddingService embeddingService;

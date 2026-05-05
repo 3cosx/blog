@@ -1,0 +1,90 @@
+package cn.cosx.blog.knowledge.rag.modules;
+
+import dev.langchain4j.model.scoring.onnx.OnnxScoringModel;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+
+@Slf4j
+public class BgeScoringModel {
+
+    private static final String CLASSPATH_MODEL = "model/bge-reranker-model/model_quantized.onnx";
+    private static final String CLASSPATH_TOKENIZER = "model/bge-reranker-model/tokenizer.json";
+
+
+    private static volatile OnnxScoringModel instance;
+
+    private BgeScoringModel() {
+    }
+    /**
+     * 获取 OnnxScoringModel 单例实例（从 classpath 加载模型）
+     *
+     * @return OnnxScoringModel 实例
+     */
+    public static OnnxScoringModel getInstance() {
+        if (instance == null) {
+            synchronized (BgeScoringModel.class) {
+                if (instance == null) {
+                    String modelPath = resolveClasspathToFilePath(CLASSPATH_MODEL);
+                    String tokenizerPath = resolveClasspathToFilePath(CLASSPATH_TOKENIZER);
+
+                    log.info("正在初始化 BGE-RERANKER 评分模型...");
+                    log.info("模型路径: {}", modelPath);
+                    log.info("Tokenizer路径: {}", tokenizerPath);
+
+                    instance = new OnnxScoringModel(modelPath, tokenizerPath,8192);
+
+                    log.info("BGE-RERANKER 评分模型初始化完成");
+                }
+            }
+        }
+        return instance;
+    }
+
+    /**
+     * 将 classpath 资源解析为文件绝对路径
+     * <p>
+     * 优先尝试直接获取文件路径（IDE 或解压目录下的资源），
+     * 如果资源在 JAR 包内则复制到临时文件后返回临时文件路径。
+     *
+     * @param classpathResource classpath 下的资源名称
+     * @return 资源的绝对文件路径
+     */
+    private static String resolveClasspathToFilePath(String classpathResource) {
+        URL resource = BgeScoringModel.class.getClassLoader().getResource(classpathResource);
+        if (resource == null) {
+            throw new IllegalArgumentException(
+                    String.format("classpath 下未找到资源: %s，请确认模型文件已放置到 resources 目录", classpathResource));
+        }
+
+        // 尝试直接获取文件路径（适用于 IDE 运行或解压目录）
+        try {
+            File file = new File(resource.toURI());
+            if (file.exists()) {
+                return file.getAbsolutePath();
+            }
+        } catch (Exception e) {
+            // 资源在 JAR 包内，无法直接转 File，走下方临时文件逻辑
+            log.debug("资源在 JAR 包内，将复制到临时文件: {}", classpathResource);
+        }
+
+        // 资源在 JAR 包内，复制到临时文件
+        try (InputStream is = BgeScoringModel.class.getClassLoader().getResourceAsStream(classpathResource)) {
+            Path tempFile = Files.createTempFile("bge-reranker-", "." + classpathResource.substring(classpathResource.lastIndexOf('.') + 1));
+            tempFile.toFile().deleteOnExit();
+            Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            log.info("已将 classpath 资源复制到临时文件: {}", tempFile.toAbsolutePath());
+            return tempFile.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new RuntimeException("无法从 classpath 复制资源到临时文件: " + classpathResource, e);
+        }
+    }
+
+
+}

@@ -1,5 +1,6 @@
 package cn.cosx.blog.knowledge.chat.entity;
 
+import cn.cosx.blog.knowledge.chat.enums.MessageType;
 import cn.cosx.blog.knowledge.chat.enums.RetrievalSource;
 import cn.cosx.blog.knowledge.document.domain.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -40,7 +41,7 @@ public class ChatMessage extends BaseEntity {
     /**
      * 角色：user/assistant
      */
-    private ChatMessageType type;
+    private MessageType type;
 
     /**
      * 消息内容

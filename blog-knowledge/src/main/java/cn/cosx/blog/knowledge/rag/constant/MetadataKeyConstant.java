@@ -13,6 +13,8 @@ public class MetadataKeyConstant {
 
     public static final String DOC_ID = "docId";
 
+    public static final String SEGMENT_ID = "segmentId";
+
     public static final String CHUNK_ID = "chunkId";
 
     /**

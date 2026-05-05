@@ -231,5 +231,24 @@ public class MinioUtils {
             log.error("[MinIO] 下载文件失败: {}", objectName, e);
             throw new RuntimeException("下载文件失败: " + objectName, e);
         }
+    }    /**
+     * 下载文件并返回字节数组
+     *
+     * @param objectName 对象名称
+     * @return 文件字节数组
+     */
+    public InputStream downloadFileAsInputStream(String objectName) {
+        try {
+            GetObjectArgs getObjectArgs = GetObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(objectName)
+                    .build();
+            try (InputStream inputStream = minioClient.getObject(getObjectArgs)) {
+                return inputStream;
+            }
+        } catch (Exception e) {
+            log.error("[MinIO] 下载文件失败: {}", objectName, e);
+            throw new RuntimeException("下载文件失败: " + objectName, e);
+        }
     }
 }

@@ -1,8 +1,8 @@
 package cn.cosx.blog.knowledge.ai.controller;
 
 import cn.cosx.blog.knowledge.ai.service.PromptService;
-import cn.cosx.blog.knowledge.chat.service.IChatMessageService;
-import cn.cosx.blog.knowledge.document.service.IKnowledgeSegmentService;
+import cn.cosx.blog.knowledge.chat.service.ChatMessageService;
+import cn.cosx.blog.knowledge.document.service.KnowledgeSegmentService;
 import cn.cosx.blog.knowledge.rag.modules.KnowEngineElasticsearchContentRetriever;
 import cn.cosx.blog.knowledge.rag.modules.KnowEngineQueryRouter;
 import dev.langchain4j.community.rag.content.retriever.neo4j.Neo4jGraph;
@@ -29,7 +29,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import static cn.cosx.blog.knowledge.config.ElasticSearchConfiguration.INDEX_NAME;
+import static cn.cosx.blog.knowledge.rag.config.ElasticsearchConfiguration.INDEX_NAME;
+
 
 /**
  * 用于ai的各个模块的功能测试
@@ -58,13 +59,13 @@ public class RagModuleController {
     private Driver neo4jDriver;
 
     @Autowired
-    private IKnowledgeSegmentService knowledgeSegmentService;
+    private KnowledgeSegmentService knowledgeSegmentService;
 
     @Autowired
     private PromptService promptService;
 
     @Autowired
-    private IChatMessageService chatMessageService;
+    private ChatMessageService chatMessageService;
 
     private ElasticsearchContentRetriever fullTextRetriever;
 
@@ -110,11 +111,12 @@ public class RagModuleController {
                 .maxResults(MAX_RESULT)
                 .indexName(INDEX_NAME)
                 .minScore(MIN_SCORE)
-                .stringRedisTemplate(knowledgeSegmentService)
+                .knowledgeSegmentService(knowledgeSegmentService)
                 .build();
 
-        KnowEngineQueryRouter knowEngineQueryRouter = new KnowEngineQueryRouter(List.of(embeddingRetriever, fullTextRetriever, sqlRetriever, neo4jRetriever), chatModel);
-        Collection<ContentRetriever> contentRetrievers = knowEngineQueryRouter.route(new Query(query));
-        return contentRetrievers.toString();
+//        KnowEngineQueryRouter knowEngineQueryRouter = new KnowEngineQueryRouter(List.of(embeddingRetriever, fullTextRetriever, sqlRetriever, neo4jRetriever), chatModel,);
+//        Collection<ContentRetriever> contentRetrievers = knowEngineQueryRouter.route(new Query(query));
+//        return contentRetrievers.toString();
+        return null;
     }
 }

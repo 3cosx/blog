@@ -1,6 +1,6 @@
 package cn.cosx.blog.knowledge.rag.modules;
 
-import cn.cosx.blog.knowledge.chat.service.IChatMessageService;
+import cn.cosx.blog.knowledge.chat.service.ChatMessageService;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.input.Prompt;
 import dev.langchain4j.model.input.PromptTemplate;
@@ -71,12 +71,12 @@ public class KnowEngineQueryTransformer implements QueryTransformer {
         applicationContext = ctx;
     }
 
-    private IChatMessageService getChatMessageService() {
+    private ChatMessageService getChatMessageService() {
         if (applicationContext == null) {
             return null;
         }
         try {
-            return applicationContext.getBean(IChatMessageService.class);
+            return applicationContext.getBean(ChatMessageService.class);
         } catch (Exception e) {
             log.warn("获取 ChatMessageService 失败", e);
             return null;
@@ -155,7 +155,7 @@ public class KnowEngineQueryTransformer implements QueryTransformer {
 
         // 异步回写改写结果到 chat_message
         if (assistantMsgId != null) {
-            IChatMessageService chatMessageService = getChatMessageService();
+            ChatMessageService chatMessageService = getChatMessageService();
             if (chatMessageService != null) {
                 Thread.ofVirtual().name("query-transform-" + assistantMsgId).start(() -> {
                     try {

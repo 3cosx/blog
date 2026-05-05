@@ -11,7 +11,7 @@ public interface IDocumentChunkService {
     /**
      * 切分文档
      *
-     * @param documentId 文档ID
+     * @param documentSplitParam 文档切分参数
      */
     void chunkDocument(DocumentSplitParam documentSplitParam);
 

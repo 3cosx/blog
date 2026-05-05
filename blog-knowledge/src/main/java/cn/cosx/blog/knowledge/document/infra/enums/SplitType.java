@@ -5,13 +5,13 @@ import lombok.Getter;
 @Getter
 public enum SplitType {
 
-    MARKDOWN_HEADER("markdown_header", "按Markdown标题层级分割"),
+    MARKDOWN_HEADER("TITLE", "按Markdown标题层级分割"),
 
-    FIXED_SIZE("fixed_size", "按固定大小分割"),
+    LENGTH("LENGTH", "按固定大小分割"),
 
-    REGEX("regex", "按正则表达式分割"),
+    REGEX("REGEX", "按正则表达式分割"),
 
-    SEPARATOR("separator", "按分隔符分割");
+    SEPARATOR("SEPARATOR", "按分隔符分割");
 
     private final String value;
     private final String desc;
@@ -21,7 +21,7 @@ public enum SplitType {
         this.desc = desc;
     }
 
-    public static SplitType fromValue(String value) {
+    public static SplitType getSplitType(String value) {
         for (SplitType type : values()) {
             if (type.value.equalsIgnoreCase(value)) {
                 return type;

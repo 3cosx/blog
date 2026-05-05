@@ -36,7 +36,7 @@ public class DocumentServiceProcessor {
      * 上传并处理文档
      */
     public Long uploadAndProcessDocument(MultipartFile file, String docTitle, String uploadUser,
-                                         String description, String accessibleBy, String useType) {
+                                         String description, String accessibleBy, String useType,String tableName) {
         try {
             String originalFilename = file.getOriginalFilename();
             FileType fileType = resolveFileType(file);
@@ -50,8 +50,7 @@ public class DocumentServiceProcessor {
             document.setStatus(DocumentStatus.INIT);
             document.setUseType(UseTypeEnums.getEnumByValue(useType));
             document.setFileType(fileType);
-            document.setOriginalFilename(originalFilename);
-
+            document.setTableName(tableName);
             KnowledgeDocument savedDocument = knowledgeDocumentService.saveDocument(document);
             Long docId = savedDocument.getDocId();
             log.info("[Document] 创建文档记录成功，docId: {}", docId);
@@ -75,8 +74,6 @@ public class DocumentServiceProcessor {
             }else{
                 knowledgeDocumentService.updateStatus(savedDocument.getDocId(), DocumentStatus.STORED);
             }
-
-
 
             return docId;
         } catch (Exception e) {

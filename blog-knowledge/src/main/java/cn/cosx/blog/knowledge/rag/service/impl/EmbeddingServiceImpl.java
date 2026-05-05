@@ -7,8 +7,9 @@ import cn.cosx.blog.knowledge.document.domain.entity.KnowledgeSegment;
 import cn.cosx.blog.knowledge.document.infra.enums.DocumentStatus;
 import cn.cosx.blog.knowledge.document.infra.enums.SegmentStatus;
 import cn.cosx.blog.knowledge.document.service.IKnowledgeDocumentService;
-import cn.cosx.blog.knowledge.document.service.IKnowledgeSegmentService;
+import cn.cosx.blog.knowledge.document.service.KnowledgeSegmentService;
 import cn.cosx.blog.knowledge.rag.service.IEmbeddingService;
+import com.alibaba.fastjson2.JSON;
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
@@ -23,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static cn.cosx.blog.knowledge.rag.constant.MetadataKeyConstant.*;
 
 /**
  * 向量化Service实现类
@@ -43,7 +46,7 @@ public class EmbeddingServiceImpl implements IEmbeddingService {
     private IKnowledgeDocumentService knowledgeDocumentService;
 
     @Autowired
-    private IKnowledgeSegmentService knowledgeSegmentService;
+    private KnowledgeSegmentService knowledgeSegmentService;
 
     @Override
     @Transactional
@@ -106,18 +109,18 @@ public class EmbeddingServiceImpl implements IEmbeddingService {
                 List<TextSegment> textSegments = new ArrayList<>();
                 for (KnowledgeSegment segment : toEmbedSegments) {
                     Map<String, String> embeddingMetadata = new HashMap<>();
-                    embeddingMetadata.put("documentId", String.valueOf(documentId));
-                    embeddingMetadata.put("segmentId", String.valueOf(segment.getId()));
-                    embeddingMetadata.put("chunkId", segment.getChunkId() != null ? segment.getChunkId() : "");
+                    embeddingMetadata.put(DOC_ID, String.valueOf(documentId));
+                    embeddingMetadata.put(SEGMENT_ID, String.valueOf(segment.getId()));
+                    embeddingMetadata.put(CHUNK_ID, segment.getChunkId() != null ? segment.getChunkId() : "");
                     embeddingMetadata.put("chunkOrder", String.valueOf(segment.getChunkOrder() != null ? segment.getChunkOrder() : 0));
 
                     // 从segment的metadata中解析parentChunkId
                     if (segment.getMetadata() != null && !segment.getMetadata().isEmpty()) {
                         try {
-                            Map<String, Object> segmentMetadata = com.alibaba.fastjson2.JSON.parseObject(segment.getMetadata());
-                            Object parentChunkId = segmentMetadata.get("parentChunkId");
+                            Map<String, Object> segmentMetadata = JSON.parseObject(segment.getMetadata());
+                            Object parentChunkId = segmentMetadata.get(PARENT_CHUNK_ID);
                             if (parentChunkId != null) {
-                                embeddingMetadata.put("parentChunkId", parentChunkId.toString());
+                                embeddingMetadata.put(PARENT_CHUNK_ID, parentChunkId.toString());
                             }
                         } catch (Exception e) {
                             log.warn("[Embedding] 解析segment metadata失败，segmentId: {}", segment.getId(), e);

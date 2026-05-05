@@ -30,7 +30,6 @@ public class XxlJobConfig {
         executor.setAccessToken(accessToken);
         executor.setAppname(appname);
         executor.setPort(port);
-        executor.setPath(path);
         executor.setLogPath("/tmp/xxl-job/logs");
         executor.setLogRetentionDays(30);
         return executor;

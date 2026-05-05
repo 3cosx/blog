@@ -4,7 +4,7 @@ import cn.cosx.blog.knowledge.common.Page;
 import cn.cosx.blog.knowledge.document.domain.entity.KnowledgeSegment;
 import cn.cosx.blog.knowledge.document.infra.enums.SegmentStatus;
 import cn.cosx.blog.knowledge.document.domain.mapper.KnowledgeSegmentMapper;
-import cn.cosx.blog.knowledge.document.service.IKnowledgeSegmentService;
+import cn.cosx.blog.knowledge.document.service.KnowledgeSegmentService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -22,7 +22,7 @@ import java.util.List;
  * 只负责对knowledge_segment表的CRUD操作
  */
 @Service
-public class KnowledgeSegmentServiceImpl extends ServiceImpl<KnowledgeSegmentMapper, KnowledgeSegment> implements IKnowledgeSegmentService {
+public class KnowledgeSegmentServiceImpl extends ServiceImpl<KnowledgeSegmentMapper, KnowledgeSegment> implements KnowledgeSegmentService {
 
 
     @Autowired
@@ -32,7 +32,10 @@ public class KnowledgeSegmentServiceImpl extends ServiceImpl<KnowledgeSegmentMap
     public String getTextByChunkId(Serializable chunkId) {
         //todo
         String text = stringRedisTemplate.opsForValue().get(chunkId);
-        if (StringUtils.hasText(text)) {
+        if (text != null) {
+            if(text.isBlank()){
+                return null;
+            }
             return text;
         }
 

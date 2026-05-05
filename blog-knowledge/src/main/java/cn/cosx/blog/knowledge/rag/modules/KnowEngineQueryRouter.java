@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static dev.langchain4j.internal.Utils.getOrDefault;
@@ -55,14 +56,17 @@ public class KnowEngineQueryRouter implements QueryRouter {
 
     private final ChatModel chatModel;
 
-    public KnowEngineQueryRouter(Collection<ContentRetriever> contentRetrievers, ChatModel chatModel) {
-        this(contentRetrievers, QUERY_ROUTE_PROMPT, chatModel);
+    private final Consumer<String> callback;
+
+    public KnowEngineQueryRouter(Collection<ContentRetriever> contentRetrievers, ChatModel chatModel,Consumer<String> callback) {
+        this(contentRetrievers, QUERY_ROUTE_PROMPT, chatModel, callback);
     }
 
-    public KnowEngineQueryRouter(Collection<ContentRetriever> contentRetrievers, PromptTemplate promptTemplate, ChatModel chatModel) {
+    public KnowEngineQueryRouter(Collection<ContentRetriever> contentRetrievers, PromptTemplate promptTemplate, ChatModel chatModel,Consumer<String> callback) {
         this.promptTemplate = getOrDefault(promptTemplate, QUERY_ROUTE_PROMPT);
         this.contentRetrievers = contentRetrievers;
         this.chatModel = chatModel;
+        this.callback = callback;
     }
 
     private static final PromptTemplate QUERY_ROUTE_PROMPT = PromptTemplate.from("""
@@ -106,6 +110,9 @@ public class KnowEngineQueryRouter implements QueryRouter {
 
     @Override
     public Collection<ContentRetriever> route(Query query) {
+        if(callback!=null) {
+            callback.accept("[PROGRESS]: 正在进行路由查询查询");
+        }
         String response = chatModel.chat(createPrompt(query).text());
 
         try {
@@ -115,14 +122,31 @@ public class KnowEngineQueryRouter implements QueryRouter {
 
             switch (strategy) {
                 case "relational_db":
-                    return contentRetrievers.stream().filter(retriever -> retriever instanceof SqlDatabaseContentRetriever).collect(Collectors.toList());
+                    return contentRetrievers.stream().filter(retriever -> {
+                        if(retriever instanceof KnowledgeProcessAwareContentRetriever){
+                            return ((KnowledgeProcessAwareContentRetriever) retriever).getRetriever() instanceof SqlDatabaseContentRetriever;
+                        }
+                        return retriever instanceof SqlDatabaseContentRetriever;
+                    }
+                    ).collect(Collectors.toList());
                 case "graph_db":
-                    return contentRetrievers.stream().filter(retriever -> retriever instanceof Neo4jText2CypherRetriever).collect(Collectors.toList());
+                    return contentRetrievers.stream().filter(retriever -> {
+                        if(retriever instanceof KnowledgeProcessAwareContentRetriever){
+                            return ((KnowledgeProcessAwareContentRetriever) retriever).getRetriever() instanceof Neo4jText2CypherRetriever;
+                        }
+                        return retriever instanceof Neo4jText2CypherRetriever;
+                    }).collect(Collectors.toList());
                 case "knowledge_base":
-                    return contentRetrievers.stream().filter(retriever -> retriever instanceof AbstractElasticsearchEmbeddingStore).collect(Collectors.toList());
+                    return contentRetrievers.stream().filter(retriever ->{
+                        if(retriever instanceof KnowledgeProcessAwareContentRetriever){
+                            return ((KnowledgeProcessAwareContentRetriever) retriever).getRetriever() instanceof AbstractElasticsearchEmbeddingStore;
+                        }
+                        return retriever instanceof AbstractElasticsearchEmbeddingStore;
+                    } ).collect(Collectors.toList());
                 default:
                     return contentRetrievers;
             }
+
 
         } catch (JSONException jsonException) {
             log.info("Route Failed , query: {} , response: {}", query, response);
@@ -132,6 +156,9 @@ public class KnowEngineQueryRouter implements QueryRouter {
             log.info("Route Failed , query: {} , response: {}", query, response);
             log.info("Route Failed , jsonException: {}", e);
             // fixme
+        }
+        if(callback!=null) {
+            callback.accept("[DONE]: 路由查询完成");
         }
         return List.of();
     }

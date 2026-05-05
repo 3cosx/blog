@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 会话Service实现类
@@ -20,8 +21,9 @@ public class ChatConversationServiceImpl extends ServiceImpl<ChatConversationMap
 
     @Override
     public String saveConversation(String title) {
-
+        String conversationId = UUID.randomUUID().toString();
         ChatConversation conversation = new ChatConversation();
+        conversation.setConversationId(conversationId);
         conversation.setTitle(title);
         conversation.setStatus(ConversationStatus.ACTIVE);
         conversation.setUserId("user");

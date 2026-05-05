@@ -1,6 +1,6 @@
 package cn.cosx.blog.knowledge.rag.modules;
 
-import cn.cosx.blog.knowledge.document.service.IKnowledgeSegmentService;
+import cn.cosx.blog.knowledge.document.service.KnowledgeSegmentService;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -51,7 +51,7 @@ public class KnowEngineElasticsearchContentRetriever extends AbstractElasticsear
     private final int maxResults;
     private final double minScore;
     private final Filter filter;
-    private final IKnowledgeSegmentService knowledgeSegmentService;
+    private final KnowledgeSegmentService knowledgeSegmentService;
 
     /**
      * Creates an instance of ElasticsearchContentRetriever using a RestClient.
@@ -73,7 +73,7 @@ public class KnowEngineElasticsearchContentRetriever extends AbstractElasticsear
             final int maxResults,
             final double minScore,
             final Filter filter,
-            IKnowledgeSegmentService knowledgeSegmentService) {
+            KnowledgeSegmentService knowledgeSegmentService) {
         this.embeddingModel = embeddingModel;
         this.maxResults = maxResults;
         this.minScore = minScore;
@@ -218,7 +218,7 @@ public class KnowEngineElasticsearchContentRetriever extends AbstractElasticsear
         private int maxResults;
         private double minScore;
         private Filter filter;
-        private IKnowledgeSegmentService knowledgeSegmentService;
+        private KnowledgeSegmentService knowledgeSegmentService;
 
         /**
          * @param restClient Elasticsearch RestClient.
@@ -268,7 +268,7 @@ public class KnowEngineElasticsearchContentRetriever extends AbstractElasticsear
         }
 
 
-        public KnowEngineElasticsearchContentRetriever.Builder stringRedisTemplate(IKnowledgeSegmentService knowledgeSegmentService) {
+        public KnowEngineElasticsearchContentRetriever.Builder knowledgeSegmentService(KnowledgeSegmentService knowledgeSegmentService) {
             this.knowledgeSegmentService = knowledgeSegmentService;
             return this;
         }

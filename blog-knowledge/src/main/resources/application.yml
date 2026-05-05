@@ -74,10 +74,6 @@ spring:
 
 # LangChain4j 配置
 langchain4j:
-  neo4j:
-    uri: bolt://192.168.10.10:7687
-    username: neo4j
-    password: neo4j666
   open-ai:
     chat-model:
       api-key: @dashscope.api.key@
@@ -91,6 +87,13 @@ langchain4j:
       base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
       log-requests: true
       log-responses: true
+  community:
+    neo4j:
+      await-index-timeout: 300
+      auth:
+        uri: bolt://192.168.10.10:7687
+        user: neo4j
+        password: neo4j666
 
 elasticsearch:
   host: http://192.168.10.10:9200
@@ -99,6 +102,11 @@ elasticsearch:
   api-key: @dashscope.api.key@
   dimensions: 1536
 
+
+neo4j:
+  uri: bolt://192.168.10.10:7687
+  username: neo4j
+  password: neo4j666
 
 minio:
   url: http://112.126.84.219:9000/

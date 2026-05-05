@@ -3,6 +3,7 @@ package cn.cosx.blog.knowledge.document.service;
 import cn.cosx.blog.knowledge.common.Page;
 import cn.cosx.blog.knowledge.document.domain.entity.KnowledgeSegment;
 import cn.cosx.blog.knowledge.document.infra.enums.SegmentStatus;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.io.Serializable;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  * 文档分片Service接口
  * 只负责对knowledge_segment表的CRUD操作
  */
-public interface IKnowledgeSegmentService {
+public interface KnowledgeSegmentService extends IService<KnowledgeSegment> {
 
     public String getTextByChunkId(Serializable chunkId) ;
         /**

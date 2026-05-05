@@ -1,12 +1,9 @@
-package cn.cosx.blog.knowledge.config;
+package cn.cosx.blog.knowledge.rag.config;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@Data
 @ConfigurationProperties(prefix = "elasticsearch")
-public class ElasticSearchProperties {
-
+public class ElasticsearchProperties {
     public static final String PREFIX = "elasticsearch";
 
     private String host;
@@ -58,4 +55,5 @@ public class ElasticSearchProperties {
     public void setDimensions(int dimensions) {
         this.dimensions = dimensions;
     }
+
 }

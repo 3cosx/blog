@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 消息Service接口
  */
-public interface IChatMessageService extends IService<ChatMessage> {
+public interface ChatMessageService extends IService<ChatMessage> {
 
     /**
      * 保存消息
@@ -21,13 +21,22 @@ public interface IChatMessageService extends IService<ChatMessage> {
     ChatMessage getByMessageId(String messageId);
 
     /**
-     * 根据会话ID查询消息列表
+     * 根据会话ID查询消息列表（按创建时间升序）
      */
     List<ChatMessage> listByConversationId(String conversationId);
+
+    /**
+     * 根据会话ID查询消息列表（按创建时间降序）
+     */
+    List<ChatMessage> listByConversationIdDesc(String conversationId);
 
     public void updateTransformContent(String messageId, String transformContent);
     /**
      * 更新RAG引用
      */
-    boolean updateRagReferences(String messageId, String ragReferences);
+    boolean updateRagReferences(String messageId, List<ChatMessage.RagReference> ragReferences);
+
+    String saveAssisantMessage(String conversationId, String content);
+
+    void updateAssistantMessage(String assistantMessageId, String string);
 }
